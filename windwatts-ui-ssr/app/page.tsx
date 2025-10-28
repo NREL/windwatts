@@ -1,6 +1,7 @@
-import { Stack, Typography } from "@mui/material";
+import { Stack, Typography, Grid } from "@mui/material";
 import Controls from "../src/components/Controls";
 import WindDataCard from "../src/components/WindDataCard";
+import Map from "../src/components/Map";
 import { era5 } from "../src/server/api";
 import { URL_PARAM_DEFAULTS } from "../src/utils/urlParams";
 
@@ -42,16 +43,19 @@ export default async function Page({
     <main style={{ padding: 24 }}>
       <Stack spacing={2}>
         <Typography variant="h5">Wind Data</Typography>
-        <Typography>
-          lat={lat.toFixed(4)}, lng={lng.toFixed(4)}, height={height}m,
-          powerCurve={powerCurve}
-        </Typography>
         <Controls />
-        {error ? (
-          <Typography color="error">{error}</Typography>
-        ) : (
-          <WindDataCard wind={wind} production={production} />
-        )}
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={7}>
+            <Map />
+          </Grid>
+          <Grid item xs={12} md={5}>
+            {error ? (
+              <Typography color="error">{error}</Typography>
+            ) : (
+              <WindDataCard wind={wind} production={production} />
+            )}
+          </Grid>
+        </Grid>
       </Stack>
     </main>
   );
