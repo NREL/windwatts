@@ -31,7 +31,7 @@ export default async function Page({
     height,
     powerCurve,
     source: "athena_era5",
-    time_period: "summary"
+    time_period: "all"
   });
 
   return (
@@ -44,11 +44,11 @@ export default async function Page({
         </Typography>
         <Typography variant="subtitle1">ERA5 Windspeed</Typography>
         <pre style={{ background: "#f5f5f5", padding: 12, borderRadius: 6 }}>
-{JSON.stringify(wind, null, 2)}
+          {JSON.stringify(wind, null, 2)}
         </pre>
-        <Typography variant="subtitle1">Energy Production (summary)</Typography>
+        <Typography variant="subtitle1">Energy Production (all)</Typography>
         <pre style={{ background: "#f5f5f5", padding: 12, borderRadius: 6 }}>
-{JSON.stringify(production, null, 2)}
+          {JSON.stringify(production, null, 2)}
         </pre>
       </Stack>
     </main>
