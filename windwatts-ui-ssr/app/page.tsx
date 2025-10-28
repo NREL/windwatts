@@ -5,7 +5,7 @@ import { URL_PARAM_DEFAULTS } from "../src/utils/urlParams";
 export const dynamic = "force-dynamic";
 
 export default async function Page({
-  searchParams
+  searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
@@ -22,7 +22,7 @@ export default async function Page({
     lat,
     lng,
     height,
-    source: "athena_era5"
+    source: "athena_era5",
   });
 
   const production = await era5.energyProduction({
@@ -31,7 +31,7 @@ export default async function Page({
     height,
     powerCurve,
     source: "athena_era5",
-    time_period: "all"
+    time_period: "all",
   });
 
   return (

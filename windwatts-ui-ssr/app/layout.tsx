@@ -2,11 +2,11 @@ import Providers from "./providers";
 
 export const metadata = {
   title: "Windwatts UI (SSR)",
-  description: "Server-side rendered Windwatts UI"
+  description: "Server-side rendered Windwatts UI",
 };
 
 export default function RootLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {

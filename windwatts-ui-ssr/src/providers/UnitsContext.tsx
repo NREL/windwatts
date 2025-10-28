@@ -14,14 +14,14 @@ export interface Units {
 
 export const defaultUnitValues: StoredUnits = {
   windspeed: "mph",
-  output: "kWh"
+  output: "kWh",
 };
 
 export const defaultValues: Units = {
   units: defaultUnitValues,
   setUnits: () => {},
   updateUnit: () => {},
-  updateUnits: () => {}
+  updateUnits: () => {},
 };
 
 export const UnitsContext = createContext<Units>(defaultValues);

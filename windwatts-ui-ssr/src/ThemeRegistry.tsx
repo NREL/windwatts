@@ -10,23 +10,28 @@ function createEmotionCache() {
   const cache = createCache({ key: "mui", prepend: true });
   // compat helps with MUI style specificity and insertion order
   // See MUI + Emotion Next.js App Router examples
-  // @ts-expect-error compat is not in types
   cache.compat = true;
   return cache;
 }
 
 const lightTheme = createTheme({
-  palette: { mode: "light" }
+  palette: { mode: "light" },
 });
 
-export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
+export default function ThemeRegistry({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [cache] = React.useState(() => createEmotionCache());
 
   useServerInsertedHTML(() => (
     <style
       data-emotion={`${cache.key} ${Object.keys(cache.inserted).join(" ")}`}
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: Object.values(cache.inserted).join("") }}
+      dangerouslySetInnerHTML={{
+        __html: Object.values(cache.inserted).join(""),
+      }}
     />
   ));
 

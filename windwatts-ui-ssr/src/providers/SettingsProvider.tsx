@@ -6,10 +6,15 @@ import {
   SettingsContext,
   defaultValues,
   type CurrentPosition,
-  type StoredSettings
+  type StoredSettings,
 } from "./SettingsContext";
 import type { DataModel } from "../types/DataModel";
-import { buildUrlFromSettings, parseUrlParams, hasLaunchParams, URL_PARAM_DEFAULTS } from "../utils/urlParams";
+import {
+  buildUrlFromSettings,
+  parseUrlParams,
+  hasLaunchParams,
+  URL_PARAM_DEFAULTS,
+} from "../utils/urlParams";
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -21,13 +26,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const hasPos = hasLaunchParams(params);
     return {
       ...defaultValues,
-      currentPosition: hasPos && params.lat && params.lng ? { lat: params.lat, lng: params.lng } : { lat: 39.7392, lng: -104.9903 },
+      currentPosition:
+        hasPos && params.lat && params.lng
+          ? { lat: params.lat, lng: params.lng }
+          : { lat: 39.7392, lng: -104.9903 },
       zoom: params.zoom ?? URL_PARAM_DEFAULTS.zoom,
       hubHeight: params.hubHeight ?? URL_PARAM_DEFAULTS.hubHeight,
       powerCurve: params.powerCurve ?? URL_PARAM_DEFAULTS.powerCurve,
       preferredModel: params.dataModel ?? URL_PARAM_DEFAULTS.dataModel,
       ensemble: params.ensemble ?? URL_PARAM_DEFAULTS.ensemble,
-      lossAssumptionFactor: 1 - (params.lossAssumption ?? URL_PARAM_DEFAULTS.lossAssumption) / 100
+      lossAssumptionFactor:
+        1 - (params.lossAssumption ?? URL_PARAM_DEFAULTS.lossAssumption) / 100,
     };
   });
 
@@ -39,7 +48,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       powerCurve: settings.powerCurve,
       preferredModel: settings.preferredModel,
       ensemble: settings.ensemble,
-      lossAssumptionPercent: Math.round((1 - settings.lossAssumptionFactor) * 100)
+      lossAssumptionPercent: Math.round(
+        (1 - settings.lossAssumptionFactor) * 100
+      ),
     });
 
     const current = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ""}`;
@@ -48,11 +59,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const setCurrentPosition = useCallback(
     (
-      position: CurrentPosition | null | ((prev: CurrentPosition | null) => CurrentPosition | null)
+      position:
+        | CurrentPosition
+        | null
+        | ((prev: CurrentPosition | null) => CurrentPosition | null)
     ) => {
       setSettings((current) => ({
         ...current,
-        currentPosition: typeof position === "function" ? position(current.currentPosition) : position || { lat: 39.7392, lng: -104.9903 }
+        currentPosition:
+          typeof position === "function"
+            ? position(current.currentPosition)
+            : position || { lat: 39.7392, lng: -104.9903 },
       }));
     },
     []
@@ -83,18 +100,27 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSettings((current) => ({ ...current, lossAssumptionFactor: clamped }));
   }, []);
 
-  const setLossAssumptionPercent = useCallback((percent: number) => {
-    const num = Math.max(0, Math.min(100, Number(percent)));
-    const factor = (100 - num) / 100;
-    setLossAssumptionFactor(factor);
-  }, [setLossAssumptionFactor]);
+  const setLossAssumptionPercent = useCallback(
+    (percent: number) => {
+      const num = Math.max(0, Math.min(100, Number(percent)));
+      const factor = (100 - num) / 100;
+      setLossAssumptionFactor(factor);
+    },
+    [setLossAssumptionFactor]
+  );
 
   const toggleSettings = useCallback(() => {
-    setSettings((current) => ({ ...current, settingsOpen: !current.settingsOpen }));
+    setSettings((current) => ({
+      ...current,
+      settingsOpen: !current.settingsOpen,
+    }));
   }, []);
 
   const toggleResults = useCallback(() => {
-    setSettings((current) => ({ ...current, resultsOpen: !current.resultsOpen }));
+    setSettings((current) => ({
+      ...current,
+      resultsOpen: !current.resultsOpen,
+    }));
   }, []);
 
   const contextValue = useMemo(
@@ -115,13 +141,35 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       setPreferredModel,
       ensemble: settings.ensemble,
       setEnsemble,
-      lossAssumptionFactor: settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor,
-      lossAssumptionPercent: Math.round((1 - (settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor)) * 100),
+      lossAssumptionFactor:
+        settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor,
+      lossAssumptionPercent: Math.round(
+        (1 -
+          (settings.lossAssumptionFactor ??
+            defaultValues.lossAssumptionFactor)) *
+        100
+      ),
       setLossAssumptionFactor,
-      setLossAssumptionPercent
+      setLossAssumptionPercent,
     }),
-    [settings, setCurrentPosition, setZoom, setHubHeight, setPowerCurve, setPreferredModel, setEnsemble, setLossAssumptionFactor, setLossAssumptionPercent, toggleSettings, toggleResults]
+    [
+      settings,
+      setCurrentPosition,
+      setZoom,
+      setHubHeight,
+      setPowerCurve,
+      setPreferredModel,
+      setEnsemble,
+      setLossAssumptionFactor,
+      setLossAssumptionPercent,
+      toggleSettings,
+      toggleResults,
+    ]
   );
 
-  return <SettingsContext.Provider value={contextValue}>{children}</SettingsContext.Provider>;
+  return (
+    <SettingsContext.Provider value={contextValue}>
+      {children}
+    </SettingsContext.Provider>
+  );
 }

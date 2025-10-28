@@ -8,8 +8,11 @@ export function UnitsProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const windspeed = (searchParams.get("windspeedUnit") as string) || defaultUnitValues.windspeed;
-  const output = (searchParams.get("outputUnit") as string) || defaultUnitValues.output;
+  const windspeed =
+    (searchParams.get("windspeedUnit") as string) ||
+    defaultUnitValues.windspeed;
+  const output =
+    (searchParams.get("outputUnit") as string) || defaultUnitValues.output;
 
   const units = { windspeed, output };
 

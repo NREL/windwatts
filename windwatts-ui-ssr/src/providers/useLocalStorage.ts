@@ -22,7 +22,8 @@ export function useLocalStorage<T>(
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       setStoredValue((currentValue) => {
-        const valueToStore = value instanceof Function ? value(currentValue) : value;
+        const valueToStore =
+          value instanceof Function ? value(currentValue) : value;
         try {
           if (isMountedRef.current) {
             window.localStorage.setItem(key, JSON.stringify(valueToStore));
