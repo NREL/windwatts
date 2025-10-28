@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, Stack, Typography } from "@mui/material";
+import { Card, CardContent, Stack, Typography, LinearProgress } from "@mui/material";
 import { useContext } from "react";
 import { UnitsContext } from "../providers/UnitsContext";
 
@@ -26,6 +26,7 @@ export default function WindDataCard({ wind, production }: { wind: any; producti
       <CardContent>
         <Stack spacing={1}>
           <Typography variant="h6">Results</Typography>
+          {!wind || !production ? <LinearProgress /> : null}
           <Typography>Wind: {windDisplay}</Typography>
           <Typography>Energy: {energyDisplay}</Typography>
         </Stack>
