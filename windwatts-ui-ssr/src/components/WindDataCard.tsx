@@ -3,6 +3,7 @@
 import { Card, CardContent, Stack, Typography, LinearProgress } from "@mui/material";
 import { useContext } from "react";
 import { UnitsContext } from "../providers/UnitsContext";
+import ProductionCards from "./ProductionCards";
 
 function formatNumber(num: number, digits = 1) {
   return Number(num).toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
@@ -14,7 +15,7 @@ export default function WindDataCard({ wind, production }: { wind: any; producti
   const globalWind = wind?.global_avg ?? wind?.yearly_avg?.["Average year"]?.["Average wind speed (m/s)"] ?? null;
   const energyKwh = production?.energy_production ?? production?.summary_avg_energy_production?.["Average year"]?.["kWh produced"] ?? null;
 
-  const windDisplay = globalWind != null ? `${formatNumber(Number(globalWind), 1)} ${units.windspeed === "mph" ? "m/s" : "m/s"}` : "—";
+  const windDisplay = globalWind != null ? `${formatNumber(Number(globalWind), 1)} m/s` : "—";
   const energyDisplay = (() => {
     if (energyKwh == null) return "—";
     if (units.output === "MWh") return `${formatNumber(Number(energyKwh) / 1000, 1)} MWh`;
@@ -24,11 +25,12 @@ export default function WindDataCard({ wind, production }: { wind: any; producti
   return (
     <Card variant="outlined">
       <CardContent>
-        <Stack spacing={1}>
+        <Stack spacing={2}>
           <Typography variant="h6">Results</Typography>
           {!wind || !production ? <LinearProgress /> : null}
-          <Typography>Wind: {windDisplay}</Typography>
-          <Typography>Energy: {energyDisplay}</Typography>
+          <Typography>Average wind speed: {windDisplay}</Typography>
+          <Typography>Estimated annual energy: {energyDisplay}</Typography>
+          {production ? <ProductionCards production={production} /> : null}
         </Stack>
       </CardContent>
     </Card>
