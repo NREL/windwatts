@@ -2,6 +2,7 @@ import { Stack, Typography, Grid } from "@mui/material";
 import Controls from "../src/components/Controls";
 import WindDataCard from "../src/components/WindDataCard";
 import SummaryBar from "../src/components/SummaryBar";
+import SearchBar from "../src/components/SearchBar";
 import Map from "../src/components/Map";
 import { era5 } from "../src/server/api";
 import { URL_PARAM_DEFAULTS } from "../src/utils/urlParams";
@@ -55,7 +56,10 @@ export default async function Page({
         <Controls powerCurves={curves} />
         <Grid container spacing={2}>
           <Grid item xs={12} md={7}>
-            <Map />
+            <Stack spacing={2}>
+              <SearchBar />
+              <Map />
+            </Stack>
           </Grid>
           <Grid item xs={12} md={5}>
             {error ? (
