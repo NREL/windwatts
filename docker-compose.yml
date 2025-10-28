@@ -34,20 +34,20 @@ services:
     depends_on:
       - windwatts-api
 
-  windwatts-ssr:
-    build:
-      context: ./windwatts-ssr
-      dockerfile: Dockerfile.dev
-    container_name: windwatts-ssr
-    env_file:
-      - ./windwatts-ssr/.env.development
-    ports:
-      - "5174:5174"
-    volumes:
-      - ./windwatts-ssr:/app
-      - ssr_node_modules:/app/node_modules
-    depends_on:
-      - windwatts-api
+  # windwatts-ssr:
+  #   build:
+  #     context: ./windwatts-ssr
+  #     dockerfile: Dockerfile.dev
+  #   container_name: windwatts-ssr
+  #   env_file:
+  #     - ./windwatts-ssr/.env.development
+  #   ports:
+  #     - "5174:5174"
+  #   volumes:
+  #     - ./windwatts-ssr:/app
+  #     - ssr_node_modules:/app/node_modules
+  #   depends_on:
+  #     - windwatts-api
 
   windwatts-ui-ssr:
     build:
@@ -56,10 +56,14 @@ services:
       args:
         WINDWATTS_API_BASE: http://nginx/api
     container_name: windwatts-ui-ssr
+    env_file:
+      - ./windwatts-ui-ssr/.env.development
     environment:
       - WINDWATTS_API_BASE=http://nginx/api
+      - NEXT_PUBLIC_MAP_API_KEY=${NEXT_PUBLIC_MAP_API_KEY}
+      - NEXT_PUBLIC_MAP_ID=${NEXT_PUBLIC_MAP_ID}
     ports:
-      - "3000:3000"
+      - "5174:5174"
     volumes:
       - ./windwatts-ui-ssr:/app
       - ui_ssr_node_modules:/app/node_modules
