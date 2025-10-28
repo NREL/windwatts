@@ -3,11 +3,9 @@ import { Stack, Typography } from "@mui/material";
 export const dynamic = "force-dynamic";
 
 async function getHealth() {
-  const base = process.env.WINDWATTS_API_BASE || "http://localhost:8000/api";
+  const base = process.env.WINDWATTS_API_BASE || (process.env.DOCKER === "1" ? "http://nginx/api" : "http://localhost:8080/api");
   const res = await fetch(`${base}/healthcheck`, {
-    // User-specific and rapidly changing; do not cache by default
     cache: "no-store",
-    // Propagate headers/cookies here if needed
     headers: {}
   });
   if (!res.ok) throw new Error("Failed to fetch healthcheck");

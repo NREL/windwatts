@@ -54,10 +54,10 @@ services:
       context: ./windwatts-ui-ssr
       dockerfile: Dockerfile.dev
       args:
-        WINDWATTS_API_BASE: http://windwatts-api:8000/api
+        WINDWATTS_API_BASE: http://nginx/api
     container_name: windwatts-ui-ssr
     environment:
-      - WINDWATTS_API_BASE=http://windwatts-api:8000/api
+      - WINDWATTS_API_BASE=http://nginx/api
     ports:
       - "3000:3000"
     volumes:
@@ -65,6 +65,7 @@ services:
       - ui_ssr_node_modules:/app/node_modules
     depends_on:
       - windwatts-api
+      - nginx
 
   nginx:
     image: nginx:alpine
