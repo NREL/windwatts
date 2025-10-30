@@ -1,10 +1,10 @@
 "use client";
 
-import { Autocomplete, useLoadScript } from "@react-google-maps/api";
+import { Autocomplete } from "@react-google-maps/api";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition, useEffect } from "react";
 
 export default function SearchBar() {
   const router = useRouter();
@@ -13,12 +13,14 @@ export default function SearchBar() {
   const [value, setValue] = useState("");
   const [isPending, startTransition] = useTransition();
   const acRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_MAP_API_KEY || "",
-    libraries: ["places"],
-    version: "quarterly"
-  });
+  useEffect(() => {
+    // mark ready when google is available
+    if (typeof window !== "undefined" && (window as any).google?.maps?.places) {
+      setIsReady(true);
+    }
+  }, []);
 
   const onLoad = (ac: google.maps.places.Autocomplete) => {
     acRef.current = ac;
@@ -39,7 +41,24 @@ export default function SearchBar() {
     startTransition(() => router.replace(`${pathname}?${next.toString()}`));
   };
 
-  if (!isLoaded) return null;
+  if (!isReady) {
+    return (
+      <TextField
+        placeholder="Enter a city, address, or landmark"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        disabled
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" />
+            </InputAdornment>
+          )
+        }}
+        fullWidth
+      />
+    );
+  }
 
   return (
     <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>

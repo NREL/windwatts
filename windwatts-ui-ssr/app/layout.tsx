@@ -2,8 +2,29 @@ import Providers from "./providers";
 import Header from "../src/components/Header";
 
 export const metadata = {
-  title: "Windwatts UI (SSR)",
-  description: "Server-side rendered Windwatts UI"
+  title: {
+    default: "WindWatts UI (SSR)",
+    template: "%s | WindWatts"
+  },
+  description: "Server-side rendered WindWatts UI",
+  icons: {
+    icon: "/icon.svg"
+  },
+  manifest: "/manifest.webmanifest",
+  openGraph: {
+    title: "WindWatts",
+    description: "Wind resource and production estimates",
+    url: "https://windwatts.nrel.gov",
+    siteName: "WindWatts",
+    locale: "en_US",
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@NREL",
+    title: "WindWatts",
+    description: "Wind resource and production estimates"
+  }
 };
 
 export default function RootLayout({

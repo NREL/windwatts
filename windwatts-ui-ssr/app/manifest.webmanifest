@@ -1,0 +1,9 @@
+{
+  "name": "WindWatts",
+  "short_name": "WindWatts",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
+  "icons": []
+}
