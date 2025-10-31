@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40">
-  <rect width="220" height="40" rx="4" fill="#003764"/>
-  <g fill="#fff">
-    <circle cx="24" cy="20" r="10" fill-opacity="0.15"/>
-    <path d="M14 26c6-9 15-9 21 0M17.5 22c4.5-7 11.5-7 16 0M21 18c3-5 7-5 10 0" stroke="#fff" stroke-width="2" fill="none"/>
-    <text x="48" y="26" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="16">NREL</text>
-  </g>
-</svg>

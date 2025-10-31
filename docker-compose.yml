@@ -58,10 +58,6 @@ services:
     container_name: windwatts-ui-ssr
     env_file:
       - ./windwatts-ui-ssr/.env.development
-    environment:
-      - WINDWATTS_API_BASE=http://nginx/api
-      - NEXT_PUBLIC_MAP_API_KEY=${NEXT_PUBLIC_MAP_API_KEY}
-      - NEXT_PUBLIC_MAP_ID=${NEXT_PUBLIC_MAP_ID}
     ports:
       - "5174:5174"
     volumes:

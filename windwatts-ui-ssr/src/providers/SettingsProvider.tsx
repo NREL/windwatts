@@ -10,7 +10,6 @@ import {
 } from "./SettingsContext";
 import type { DataModel } from "../types/DataModel";
 import {
-  buildUrlFromSettings,
   parseUrlParams,
   hasLaunchParams,
   URL_PARAM_DEFAULTS,
@@ -40,21 +39,45 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     };
   });
 
+  // Sync settings from URL whenever searchParams change
   useEffect(() => {
-    const url = buildUrlFromSettings({
-      currentPosition: settings.currentPosition,
-      zoom: settings.zoom,
-      hubHeight: settings.hubHeight,
-      powerCurve: settings.powerCurve,
-      preferredModel: settings.preferredModel,
-      ensemble: settings.ensemble,
-      lossAssumptionPercent: Math.round(
-        (1 - settings.lossAssumptionFactor) * 100
-      ),
-    });
+    const params = parseUrlParams(searchParams);
+    const hasPos = hasLaunchParams(params);
+    setSettings((current) => ({
+      ...current,
+      currentPosition:
+        hasPos && params.lat && params.lng
+          ? { lat: params.lat, lng: params.lng }
+          : { lat: 39.7392, lng: -104.9903 },
+      zoom: params.zoom ?? URL_PARAM_DEFAULTS.zoom,
+      hubHeight: params.hubHeight ?? URL_PARAM_DEFAULTS.hubHeight,
+      powerCurve: params.powerCurve ?? URL_PARAM_DEFAULTS.powerCurve,
+      preferredModel: params.dataModel ?? URL_PARAM_DEFAULTS.dataModel,
+      ensemble: params.ensemble ?? URL_PARAM_DEFAULTS.ensemble,
+      lossAssumptionFactor:
+        1 - (params.lossAssumption ?? URL_PARAM_DEFAULTS.lossAssumption) / 100,
+    }));
+  }, [searchParams]);
 
+  // Normalize URL whenever settings change, only if different from current
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams as any);
+    const position = settings.currentPosition ?? { lat: 39.7392, lng: -104.9903 };
+    next.set("lat", position.lat.toFixed(4));
+    next.set("lng", position.lng.toFixed(4));
+    next.set("zoom", Math.round(settings.zoom).toString());
+    next.set("hubHeight", String(settings.hubHeight));
+    next.set("powerCurve", settings.powerCurve);
+    next.set("dataModel", settings.preferredModel);
+    next.set("ensemble", settings.ensemble ? "true" : "false");
+    next.set(
+      "lossAssumption",
+      String(Math.max(0, Math.min(100, Math.round((1 - settings.lossAssumptionFactor) * 100))))
+    );
+
+    const target = `${pathname}?${next.toString()}`;
     const current = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ""}`;
-    if (url !== current) router.replace(url);
+    if (target !== current) router.replace(target);
   }, [router, pathname, searchParams, settings]);
 
   const setCurrentPosition = useCallback(
@@ -62,7 +85,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       position:
         | CurrentPosition
         | null
-        | ((prev: CurrentPosition | null) => CurrentPosition | null)
+        | ((prev: CurrentPosition | null) => CurrentPosition | null),
     ) => {
       setSettings((current) => ({
         ...current,
@@ -113,21 +136,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSettings((current) => ({
       ...current,
       settingsOpen: !current.settingsOpen,
-    }));
+    } as any));
   }, []);
 
   const toggleResults = useCallback(() => {
-    setSettings((current) => ({
-      ...current,
-      resultsOpen: !current.resultsOpen,
-    }));
+    setSettings((current) => ({ ...current, resultsOpen: !current.resultsOpen }));
   }, []);
 
   const contextValue = useMemo(
     () => ({
-      settingsOpen: settings.settingsOpen,
+      settingsOpen: (settings as any).settingsOpen,
       toggleSettings,
-      resultsOpen: settings.resultsOpen,
+      resultsOpen: (settings as any).resultsOpen,
       toggleResults,
       currentPosition: settings.currentPosition,
       setCurrentPosition,
@@ -144,9 +164,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       lossAssumptionFactor:
         settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor,
       lossAssumptionPercent: Math.round(
-        (1 -
-          (settings.lossAssumptionFactor ??
-            defaultValues.lossAssumptionFactor)) *
+        (1 - (settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor)) *
         100
       ),
       setLossAssumptionFactor,

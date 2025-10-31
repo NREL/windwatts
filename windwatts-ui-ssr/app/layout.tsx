@@ -1,5 +1,6 @@
 import Providers from "./providers";
 import Header from "../src/components/Header";
+import SettingsModal from "../src/components/SettingsModal";
 
 export const metadata = {
   title: {
@@ -40,6 +41,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <Header />
+          <SettingsModal />
           {children}
         </Providers>
       </body>

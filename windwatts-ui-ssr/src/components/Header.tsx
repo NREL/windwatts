@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Header() {
   const APP_TITLE = process.env.NEXT_PUBLIC_APP_TITLE || "Wind Watts";
   return (
-    <AppBar position="sticky" sx={{ bgcolor: "#0279c2" }}>
+    <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#0279c2", boxShadow: "none" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <MuiLink
           href="/"
@@ -19,9 +19,9 @@ export default function Header() {
         </MuiLink>
         <Box
           component="img"
-          sx={{ height: 40 }}
-          src="/NREL-logo-reversed.svg"
+          src="/NREL-logo-reversed.png"
           alt="NREL Logo"
+          sx={{ height: 40, width: "auto", display: "block" }}
         />
       </Toolbar>
     </AppBar>

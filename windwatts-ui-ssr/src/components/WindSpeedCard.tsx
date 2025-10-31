@@ -25,3 +25,5 @@ export default function WindSpeedCard({ wind }: { wind: any }) {
     </Card>
   );
 }
+
+
