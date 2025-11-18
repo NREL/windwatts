@@ -66,3 +66,25 @@ class AthenaDataFetcher(AbstractDataFetcher):
             return self.client.fetch_hourly_avg_at_height(lat=lat, long=lng, height=height)
         else:
             raise ValueError(f"Invalid avg_type: {avg_type}")
+    
+    def find_nearest_locations(self, lat: float, lng: float, n_neighbors: int = 1):
+        """
+        Find one or more nearest grid locations (index, latitude, and longitude) to a given coordinate.
+
+        :param lat: Latitude of the target location in decimal degrees.
+        :type lat: float
+        :param lng: Longitude of the target location in decimal degrees.
+        :type lng: float
+        :param n_neighbors: Number of nearest grid points to return. Defaults to 1.
+        :type n_neighbors: int
+
+        :return: 
+            - If n_neighbors == 1: a list of single tuple [(index, latitude, longitude)] for the nearest grid point.  
+            - If n_neighbors > 1: a list of tuples, each containing (index, latitude, longitude).
+            - The list will have length n_neighbors.
+        :rtype: 
+            :rtype: list[tuple[str, float, float]]
+        """
+        # A list of tuples where each tuple contains: (grid_index, latitude, longitude)
+        tuples = self.client.find_n_nearest_locations(lat, lng, n_neighbors)
+        return tuples

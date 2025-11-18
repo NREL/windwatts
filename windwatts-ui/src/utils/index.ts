@@ -92,6 +92,17 @@ export const formatNumber = (
   });
 };
 
+/**
+ * Format a coordinate value to 3 decimal places.
+ * Used consistently across UI display and filename generation.
+ * 
+ * @param {number} coordinate latitude or longitude value
+ * @returns {string} formatted coordinate string (e.g., "40.123")
+ */
+export const formatCoordinate = (coordinate: number): string => {
+  return coordinate.toFixed(3);
+};
+
 export function isOutOfBounds(
   lat: number,
   lng: number,
@@ -118,9 +129,7 @@ export function getOutOfBoundsMessage(
   const bounds = MODEL_COORDINATES_BOUNDS[model];
   if (!bounds) return "No bounds defined for this model.";
   return (
-    `(${lat.toFixed(3)}, ${lng.toFixed(
-      3
-    )}) is outside the supported region for ${model.toUpperCase()}:\n` +
+    `(${formatCoordinate(lat)}, ${formatCoordinate(lng)}) is outside the supported region for ${model.toUpperCase()}:\n` +
     `Lat: [${bounds.minLat} ~ ${bounds.maxLat}], Lng: [${bounds.minLng} ~ ${bounds.maxLng}]`
   );
 }

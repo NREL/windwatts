@@ -37,7 +37,6 @@ class DataFetcherRouter:
             return fetcher.fetch_data(**params)
         else:
             raise ValueError(f"No fetcher found for source={source}")
-        
 
     def fetch_data_routing(self, params: dict, source: str = "athena_wtk"):
         """

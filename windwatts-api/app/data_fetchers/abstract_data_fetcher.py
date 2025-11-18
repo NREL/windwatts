@@ -12,13 +12,13 @@ class AbstractDataFetcher(ABC):
         pass
 
     @abstractmethod
-    def fetch_data(self, lat: float, lon: float, height: int):
+    def fetch_data(self, lat: float, lng: float, height: int):
         """
         Data fetching method specifications:
         
         Args:
             lat (float): Latitude of the location
-            lon (float): Longitude of the location
+            lng (float): Longitude of the location
             height (int): Height in integer
 
         Returns:

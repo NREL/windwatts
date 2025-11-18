@@ -16,7 +16,7 @@ import { AnalysisResults } from "./AnalysisResults";
 import { useContext, useState } from "react";
 import { SettingsContext } from "../../providers/SettingsContext";
 import { POWER_CURVE_LABEL } from "../../constants";
-import { ShareButton } from "../shared";
+import { ShareButton, DownloadButton } from "../shared";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -26,30 +26,34 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export const RightPane = () => {
-  const { currentPosition, hubHeight, powerCurve, toggleSettings } =
-    useContext(SettingsContext);
+  const {
+    currentPosition,
+    hubHeight,
+    powerCurve,
+    toggleSettings,
+  } = useContext(SettingsContext);
 
   const { lat, lng } = currentPosition ?? {};
 
-  const settingOptions = [
-    {
-      title: "Location",
-      data:
-        currentPosition && lat && lng
-          ? `${lat.toFixed(3)}, ${lng.toFixed(3)}`
-          : "Not selected",
-    },
-    {
-      title: "Hub height",
-      data: hubHeight ? `${hubHeight} meters` : "Not selected",
-    },
-    {
-      title: "Power curve",
-      data: powerCurve ? `${POWER_CURVE_LABEL[powerCurve]}` : "Not selected",
-    },
-  ];
-
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  const settingOptions = [
+      {
+        title: "Location",
+        data:
+          currentPosition && lat && lng
+            ? `${lat.toFixed(3)}, ${lng.toFixed(3)}`
+            : "Not selected",
+      },
+      {
+        title: "Hub height",
+        data: hubHeight ? `${hubHeight} meters` : "Not selected",
+      },
+      {
+        title: "Power curve",
+        data: powerCurve ? `${POWER_CURVE_LABEL[powerCurve]}` : "Not selected",
+      },
+    ];
 
   return (
     <Box
@@ -130,7 +134,9 @@ export const RightPane = () => {
 
         <AnalysisResults />
 
-        <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+        <DownloadButton />
+
+        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
           <Chip
             label="Disclaimer"
             color="info"

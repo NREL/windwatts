@@ -135,3 +135,33 @@ class HealthCheckResponse(BaseModel):
             "example": {"status": "up"}
         }
     }
+
+class GridLocation(BaseModel):
+    index: str = Field(..., description="Grid point identifier/index")
+    latitude: float = Field(..., ge=-90, le=90, description="Latitude coordinate")
+    longitude: float = Field(..., ge=-180, le=180, description="Longitude coordinate")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {"index": "031233", "latitude": 43.653, "longitude": -79.47437700534891}
+        }
+    }
+
+class NearestLocationsResponse(BaseModel):
+    locations: List[GridLocation] = Field(
+        ..., 
+        min_length=1, 
+        max_length=4, 
+        description="List of nearest grid locations (1-4 points)"
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "locations": [
+                    {"index": "031233", "latitude": 43.653, "longitude": -79.47437700534891},
+                    {"index": "031234", "latitude": 43.653, "longitude": -79.22437433155213}
+                ]
+            }
+        }
+    }

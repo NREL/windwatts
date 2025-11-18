@@ -1,4 +1,10 @@
-import { EnergyProductionRequest, WindspeedByLatLngRequest } from "../types";
+import { 
+  EnergyProductionRequest,
+  WindspeedByLatLngRequest,
+  NearestGridLocationRequest,
+  WindCSVFileRequest,
+  WindCSVFilesRequest
+} from "../types";
 
 export const fetchWrapper = async (url: string, options: RequestInit) => {
   const response = await fetch(url, options);
@@ -6,6 +12,14 @@ export const fetchWrapper = async (url: string, options: RequestInit) => {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   return response.json();
+};
+
+export const fetchBlobWrapper = async (url: string, options: RequestInit) => {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response;
 };
 // time_period = "global" is default for windspeed in the era5_controller. But have to include "source" param as "athena_ensemble" for ensemble model result and "athena_era5" for regular era5 result which is default anyway.
 export const getWindspeedByLatLong = async ({
@@ -68,4 +82,54 @@ export const getAvailablePowerCurves = async () => {
     },
   };
   return fetchWrapper(url, options);
+};
+
+export const getNearestGridLocation = async ({
+  lat,
+  lng,
+  n_neighbors = 1,
+  dataModel
+}: NearestGridLocationRequest) => {
+  const url = `/api/${dataModel}/nearest-locations?lat=${lat}&lng=${lng}&n_neighbors=${n_neighbors}`;
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  return fetchWrapper(url, options);
+};
+
+export const getCSVFile = async ({
+  gridIndex,
+  dataModel
+}: WindCSVFileRequest) => {
+  
+  const url = `/api/${dataModel}/download-csv?gridIndex=${gridIndex}`;
+  
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  return fetchBlobWrapper(url, options);
+};
+
+export const getBatchCSVFiles = async ({
+  gridLocations,
+  dataModel,
+}: WindCSVFilesRequest) => {
+  const url = `/api/${dataModel}/download-csv-batch`;
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ locations: gridLocations}),
+  };
+
+  return fetchBlobWrapper(url, options);
 };
