@@ -136,7 +136,7 @@ export const RightPane = () => {
 
         <DownloadButton />
 
-        <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
           <Chip
             label="Disclaimer"
             color="info"

@@ -8,7 +8,7 @@ export const DownloadButton = () => {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", m: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 2 }}>
         <Button
           variant="contained"
           size="small"
