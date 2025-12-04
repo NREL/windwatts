@@ -219,17 +219,19 @@ def get_windspeed(
 def fetch_available_powercurves():
     try:
         all_curves = list(power_curve_manager.power_curves.keys())
+        prefix = 'nlr-reference-'
+        
         def extract_kw(curve_name: str):
             import re
-            match = re.search(r"nrel-reference-([0-9.]+)kW", curve_name)
+            match = re.search(rf"{prefix}([0-9.]+)kW", curve_name)
             if match:
                 return float(match.group(1))
             return float('inf')
-        nrel_curves = [c for c in all_curves if c.startswith("nrel-reference-")]
-        other_curves = [c for c in all_curves if not c.startswith("nrel-reference-")]
-        nrel_curves_sorted = sorted(nrel_curves, key=extract_kw)
+        curves = [c for c in all_curves if c.startswith(prefix)]
+        other_curves = [c for c in all_curves if not c.startswith(prefix)]
+        curves_sorted = sorted(curves, key=extract_kw)
         other_curves_sorted = sorted(other_curves)
-        ordered_curves = nrel_curves_sorted + other_curves_sorted
+        ordered_curves = curves_sorted + other_curves_sorted
         return {'available_power_curves': ordered_curves}
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error.")
