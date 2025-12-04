@@ -6,11 +6,11 @@ import { useContext } from "react";
 import { getAvailablePowerCurves } from "../../services/api";
 import { POWER_CURVE_LABEL } from "../../constants";
 
-const NRELPowerCurveOptions = [
-  "nrel-reference-2.5kW",
-  "nrel-reference-100kW",
-  "nrel-reference-250kW",
-  "nrel-reference-2000kW",
+const DefaultPowerCurveOptions = [
+  "nlr-reference-2.5kW",
+  "nlr-reference-100kW",
+  "nlr-reference-250kW",
+  "nlr-reference-2000kW",
 ];
 
 export function PowerCurveSettings() {
@@ -20,7 +20,7 @@ export function PowerCurveSettings() {
   const { data } = useSWR(
     "/api/wtk/available-powercurves",
     getAvailablePowerCurves,
-    { fallbackData: { available_power_curves: NRELPowerCurveOptions } }
+    { fallbackData: { available_power_curves: DefaultPowerCurveOptions } }
   );
 
   const powerCurveOptions: string[] = data?.available_power_curves || [];

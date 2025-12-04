@@ -45,7 +45,7 @@ export const defaultValues: StoredSettings = {
   currentPosition: null,
   zoom: 12,
   hubHeight: 40,
-  powerCurve: "nrel-reference-100kW",
+  powerCurve: "nlr-reference-100kW",
   preferredModel: "era5",
   ensemble: false,
   lossAssumptionFactor: 1.0, // 1.0 = 0% loss, 0.83 = 17% loss defaulted to 0% loss

@@ -17,7 +17,7 @@ export interface UrlParams {
 export const URL_PARAM_DEFAULTS = {
   zoom: 12,
   hubHeight: 40,
-  powerCurve: "nrel-reference-2.5kW",
+  powerCurve: "nlr-reference-100kW",
   dataModel: "era5" as DataModel,
   ensemble: false,
   lossAssumption: 0,
