@@ -24,7 +24,7 @@ export function LayoutDesktop() {
             <Box
               component="img"
               sx={{ height: 40 }}
-              src="/assets/NREL-logo-reversed.png"
+              src="/assets/NLR-Blue-TypeTreatment-Block-Top-RGB.svg"
               alt="NREL Logo"
             />
           </Toolbar>
