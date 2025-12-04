@@ -163,7 +163,7 @@ export const RightPane = () => {
               rel="noopener noreferrer"
               underline="hover"
             >
-              NREL's Wind Resource Database
+              NLR's Wind Resource Database
             </Link>
             .
           </Typography>

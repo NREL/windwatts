@@ -13,11 +13,11 @@ export const DATA_MODEL_INFO: Record<string, DataModelInfo> = {
     wind_direction_heights: ["10m", "100m"],
   },
   wtk: {
-    label: "NREL's 20-year WTK-LED dataset",
+    label: "NLR's 20-year WTK-LED dataset",
     source_href:
       "https://www.energy.gov/eere/wind/articles/new-wind-resource-database-includes-updated-wind-toolkit",
     help_href: "",
-    description: "NREL's 20-year WTK-LED Dataset",
+    description: "NLR's 20-year WTK-LED Dataset",
     year_range: "",
     wind_speed_heights: [],
     wind_direction_heights: [],

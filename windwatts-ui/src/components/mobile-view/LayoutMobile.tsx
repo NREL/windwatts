@@ -46,7 +46,7 @@ const LayoutMobileContent = () => {
               component="img"
               sx={{ height: 40 }}
               src="/assets/NLR-Blue-TypeTreatment-Block-Top-RGB.svg"
-              alt="NREL Logo"
+              alt="NLR Logo"
             />
           </Toolbar>
         </AppBar>
