@@ -26,34 +26,30 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export const RightPane = () => {
-  const {
-    currentPosition,
-    hubHeight,
-    powerCurve,
-    toggleSettings,
-  } = useContext(SettingsContext);
+  const { currentPosition, hubHeight, powerCurve, toggleSettings } =
+    useContext(SettingsContext);
 
   const { lat, lng } = currentPosition ?? {};
 
   const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const settingOptions = [
-      {
-        title: "Location",
-        data:
-          currentPosition && lat && lng
-            ? `${lat.toFixed(3)}, ${lng.toFixed(3)}`
-            : "Not selected",
-      },
-      {
-        title: "Hub height",
-        data: hubHeight ? `${hubHeight} meters` : "Not selected",
-      },
-      {
-        title: "Power curve",
-        data: powerCurve ? `${POWER_CURVE_LABEL[powerCurve]}` : "Not selected",
-      },
-    ];
+    {
+      title: "Location",
+      data:
+        currentPosition && lat && lng
+          ? `${lat.toFixed(3)}, ${lng.toFixed(3)}`
+          : "Not selected",
+    },
+    {
+      title: "Hub height",
+      data: hubHeight ? `${hubHeight} meters` : "Not selected",
+    },
+    {
+      title: "Power curve",
+      data: powerCurve ? `${POWER_CURVE_LABEL[powerCurve]}` : "Not selected",
+    },
+  ];
 
   return (
     <Box
@@ -163,7 +159,7 @@ export const RightPane = () => {
               rel="noopener noreferrer"
               underline="hover"
             >
-              NREL's Wind Resource Database
+              NLR's Wind Resource Database
             </Link>
             .
           </Typography>

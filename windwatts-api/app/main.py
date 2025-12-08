@@ -18,7 +18,7 @@ app = FastAPI(
     root_path="/api",
     description=dedent(
         """
-        Welcome to NREL's WindWatts API.
+        Welcome to NLR's WindWatts API.
 
         - Rate limits: 1000 requests per minute per IP.
         - Base path: `/api`

@@ -181,7 +181,7 @@ To read a concise summary of the DW-TAP project, please refer to: https://www.en
 
 ## Credit
 
-Code in this repository was developed by Dmitry Duplyakin (dmitry.duplyakin@nrel.gov), Caleb Phillips (caleb.phillips@nrel.gov), and Sagi Zisman (sagi.zisman@nrel.gov) to demonstrate the techniques used in distributed wind resource assessment at the National Renewable Energy Laboratory in Golden, Colorado, USA.
+Code in this repository was developed by Dmitry Duplyakin (dmitry.duplyakin@nrel.gov), Caleb Phillips (caleb.phillips@nrel.gov), and Sagi Zisman (sagi.zisman@nrel.gov) to demonstrate the techniques used in distributed wind resource assessment at the National Laboratory of the Rockies in Golden, Colorado, USA.
 
 ## License
 

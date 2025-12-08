@@ -5,7 +5,7 @@ export type {
   EnergyProductionRequest,
   NearestGridLocationRequest,
   WindCSVFileRequest,
-  WindCSVFilesRequest
+  WindCSVFilesRequest,
 } from "./Requests";
 export type { Heights } from "./Heights";
 export type { StoredUnits } from "./Units";

@@ -13,3 +13,6 @@ export * from "./core";
 
 // Shared components
 export { OutOfBoundsWarning } from "./shared";
+
+// Footer
+export { Footer } from "./Footer";

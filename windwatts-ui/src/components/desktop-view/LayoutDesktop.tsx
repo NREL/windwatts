@@ -1,8 +1,8 @@
-import { Footer } from "nrel-branding-react";
 import { Outlet, Link as RouterLink } from "react-router-dom";
 import { Link, Box, AppBar, Toolbar } from "@mui/material";
 import { Settings } from "../settings";
 import { RightPane } from "../resultPane";
+import { Footer } from "../Footer";
 
 export function LayoutDesktop() {
   const APP_TITLE = import.meta.env.VITE_APP_TITLE || "Wind Watts";
@@ -24,8 +24,8 @@ export function LayoutDesktop() {
             <Box
               component="img"
               sx={{ height: 40 }}
-              src="/assets/NREL-logo-reversed.png"
-              alt="NREL Logo"
+              src="/assets/NLR-Blue-TypeTreatment-Block-Top-RGB.svg"
+              alt="NLR Logo"
             />
           </Toolbar>
         </AppBar>

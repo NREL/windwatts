@@ -45,8 +45,8 @@ const LayoutMobileContent = () => {
             <Box
               component="img"
               sx={{ height: 40 }}
-              src="/assets/NREL-logo-reversed.png"
-              alt="NREL Logo"
+              src="/assets/NLR-Blue-TypeTreatment-Block-Top-RGB.svg"
+              alt="NLR Logo"
             />
           </Toolbar>
         </AppBar>

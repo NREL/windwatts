@@ -17,7 +17,7 @@ export interface UrlParams {
 export const URL_PARAM_DEFAULTS = {
   zoom: 12,
   hubHeight: 40,
-  powerCurve: "nrel-reference-2.5kW",
+  powerCurve: "nlr-reference-100kW",
   dataModel: "era5" as DataModel,
   ensemble: false,
   lossAssumption: 0,
@@ -154,7 +154,8 @@ export function buildUrlFromSettings(settings: {
     settings.windspeedUnit !== URL_PARAM_DEFAULTS.windspeedUnit
   ) {
     // Convert "m/s" to "ms" for URL compatibility
-    const urlValue = settings.windspeedUnit === "m/s" ? "ms" : settings.windspeedUnit;
+    const urlValue =
+      settings.windspeedUnit === "m/s" ? "ms" : settings.windspeedUnit;
     params.set("windspeedUnit", urlValue);
   }
 

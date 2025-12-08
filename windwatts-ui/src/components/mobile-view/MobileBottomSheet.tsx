@@ -8,8 +8,8 @@ import React, {
 import { Box, IconButton } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { RightPane } from "../resultPane/RightPane";
-import { Footer } from "nrel-branding-react";
 import { SearchResultsList, MobileSearchBar } from "./components";
+import { Footer } from "../Footer";
 import {
   MobileBottomSheetProps,
   MobileBottomSheetRef,

@@ -58,8 +58,8 @@ class AvailablePowerCurvesResponse(BaseModel):
         "json_schema_extra": {
             "example": {
                 "available_power_curves": [
-                    "nrel-reference-2.5kW",
-                    "nrel-reference-100kW",
+                    "nlr-reference-2.5kW",
+                    "nlr-reference-100kW",
                 ]
             }
         }

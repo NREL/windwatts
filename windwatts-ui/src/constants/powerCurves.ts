@@ -1,8 +1,8 @@
 export const POWER_CURVE_LABEL: Record<string, string> = {
-  "nrel-reference-2.5kW": "NREL Reference 2.5kW",
-  "nrel-reference-100kW": "NREL Reference 100kW",
-  "nrel-reference-250kW": "NREL Reference 250kW",
-  "nrel-reference-2000kW": "NREL Reference 2000kW",
+  "nlr-reference-2.5kW": "NLR Reference 2.5kW",
+  "nlr-reference-100kW": "NLR Reference 100kW",
+  "nlr-reference-250kW": "NLR Reference 250kW",
+  "nlr-reference-2000kW": "NLR Reference 2000kW",
   "bergey-excel-15": "Bergey Excel 15kW",
   "eocycle-25": "Eocycle 25kW",
   "northern-100": "Northern Power 100kW",

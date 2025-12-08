@@ -5,3 +5,4 @@ export * from "./ui";
 export * from "./dataModelInfo";
 export * from "./hubSettings";
 export * from "./dataKeys";
+export * from "./footer";
