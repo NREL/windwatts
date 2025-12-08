@@ -95,7 +95,7 @@ export const formatNumber = (
 /**
  * Format a coordinate value to 3 decimal places.
  * Used consistently across UI display and filename generation.
- * 
+ *
  * @param {number} coordinate latitude or longitude value
  * @returns {string} formatted coordinate string (e.g., "40.123")
  */

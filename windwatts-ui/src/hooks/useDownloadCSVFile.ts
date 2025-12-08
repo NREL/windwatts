@@ -1,18 +1,27 @@
 import { useState, useMemo, useContext } from "react";
 import useSWR from "swr";
-import { getCSVFile, getBatchCSVFiles, getNearestGridLocation } from "../services/api";
+import {
+  getCSVFile,
+  getBatchCSVFiles,
+  getNearestGridLocation,
+} from "../services/api";
 import { downloadWindDataCSV, downloadWindDataZIP } from "../services/download";
 import { SettingsContext } from "../providers/SettingsContext";
 import { GridLocation } from "../types";
 
 export const useDownloadCSVFile = () => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const { currentPosition, preferredModel: dataModel } = useContext(SettingsContext);
+  const { currentPosition, preferredModel: dataModel } =
+    useContext(SettingsContext);
   const { lat, lng } = currentPosition || {};
 
   const canDownload = !!(lat && lng && dataModel);
 
-  const downloadFile = async (gridLat: number, gridLng: number, gridIndex: string) => {
+  const downloadFile = async (
+    gridLat: number,
+    gridLng: number,
+    gridIndex: string
+  ) => {
     try {
       setIsDownloading(true);
       const response = await getCSVFile({
@@ -50,7 +59,7 @@ export const useDownloadCSVFile = () => {
     canDownload,
     isDownloading,
     downloadFile,
-    downloadBatchFiles
+    downloadBatchFiles,
   };
 };
 
@@ -64,10 +73,21 @@ export const useNearestGridLocation = (n_neighbors: number = 1) => {
   // Memoize the SWR key to prevent unnecessary re-renders
   const swrKey = useMemo(() => {
     if (!shouldFetch) return null;
-    return JSON.stringify({ lat, lng, n_neighbors, dataModel, type: "nearest-grid" });
+    return JSON.stringify({
+      lat,
+      lng,
+      n_neighbors,
+      dataModel,
+      type: "nearest-grid",
+    });
   }, [shouldFetch, lat, lng, n_neighbors, dataModel]);
 
-  const { isLoading, data, error, mutate: retry } = useSWR(
+  const {
+    isLoading,
+    data,
+    error,
+    mutate: retry,
+  } = useSWR(
     swrKey,
     () =>
       getNearestGridLocation({
@@ -84,11 +104,12 @@ export const useNearestGridLocation = (n_neighbors: number = 1) => {
     }
   );
 
-  const gridLocations = data?.locations?.map((location: GridLocation) => ({
-    latitude: location.latitude,
-    longitude: location.longitude,
-    index: location.index
-  })) || [];
+  const gridLocations =
+    data?.locations?.map((location: GridLocation) => ({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      index: location.index,
+    })) || [];
 
   return {
     gridLocations,

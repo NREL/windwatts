@@ -9,5 +9,7 @@ export { useToggle } from "./useToggle";
 export { useWindData } from "./useWindData";
 export { useLossAdjustedProductionData } from "./useLossAdjustedProductionData";
 export { useOutputUnit } from "./useOutputUnit";
-export { useDownloadCSVFile, useNearestGridLocation } from "./useDownloadCSVFile";
-
+export {
+  useDownloadCSVFile,
+  useNearestGridLocation,
+} from "./useDownloadCSVFile";

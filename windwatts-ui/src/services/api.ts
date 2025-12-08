@@ -1,9 +1,9 @@
-import { 
+import {
   EnergyProductionRequest,
   WindspeedByLatLngRequest,
   NearestGridLocationRequest,
   WindCSVFileRequest,
-  WindCSVFilesRequest
+  WindCSVFilesRequest,
 } from "../types";
 
 export const fetchWrapper = async (url: string, options: RequestInit) => {
@@ -88,7 +88,7 @@ export const getNearestGridLocation = async ({
   lat,
   lng,
   n_neighbors = 1,
-  dataModel
+  dataModel,
 }: NearestGridLocationRequest) => {
   const url = `/api/${dataModel}/nearest-locations?lat=${lat}&lng=${lng}&n_neighbors=${n_neighbors}`;
   const options = {
@@ -102,11 +102,10 @@ export const getNearestGridLocation = async ({
 
 export const getCSVFile = async ({
   gridIndex,
-  dataModel
+  dataModel,
 }: WindCSVFileRequest) => {
-  
   const url = `/api/${dataModel}/download-csv?gridIndex=${gridIndex}`;
-  
+
   const options = {
     method: "GET",
     headers: {
@@ -128,7 +127,7 @@ export const getBatchCSVFiles = async ({
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ locations: gridLocations}),
+    body: JSON.stringify({ locations: gridLocations }),
   };
 
   return fetchBlobWrapper(url, options);

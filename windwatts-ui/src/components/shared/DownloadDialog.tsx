@@ -9,7 +9,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Skeleton
+  Skeleton,
 } from "@mui/material";
 import { useState, useContext } from "react";
 import { DATA_MODEL_INFO } from "../../constants";
@@ -22,8 +22,9 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
 
   const [n_neighbors, setN_neighbors] = useState(1); // single nearest neighbor
   void setN_neighbors; // avoid unused variable warning
-  
-  const { canDownload, isDownloading, downloadFile, downloadBatchFiles } = useDownloadCSVFile();
+
+  const { canDownload, isDownloading, downloadFile, downloadBatchFiles } =
+    useDownloadCSVFile();
   const {
     gridLocations,
     isLoading: isLoadingGridLocation,
@@ -31,28 +32,31 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
     retry: retryGridLocation,
   } = useNearestGridLocation(n_neighbors);
 
-  const { currentPosition, preferredModel: dataModel } = useContext(SettingsContext);
+  const { currentPosition, preferredModel: dataModel } =
+    useContext(SettingsContext);
   const { lat, lng } = currentPosition || {};
   const downloadInfo = dataModel ? DATA_MODEL_INFO[dataModel] : null;
 
-  const nearestGridLocation = gridLocations.length > 0 ? gridLocations[0] : null;
+  const nearestGridLocation =
+    gridLocations.length > 0 ? gridLocations[0] : null;
   const hasError = !!(gridLocationError || downloadError);
   const isProcessing = isDownloading || isLoadingGridLocation;
 
   const hasEnoughNeighbors =
-  (n_neighbors === 1 && gridLocations.length >= 1) ||
-  (n_neighbors > 1 && gridLocations.length >= n_neighbors);
+    (n_neighbors === 1 && gridLocations.length >= 1) ||
+    (n_neighbors > 1 && gridLocations.length >= n_neighbors);
 
-  const canConfirm = !isProcessing && !hasError && !!gridLocations && hasEnoughNeighbors;
+  const canConfirm =
+    !isProcessing && !hasError && !!gridLocations && hasEnoughNeighbors;
 
   const handleConfirm = async () => {
     setDownloadError(null);
 
     if (gridLocations.length === 0) {
-    setDownloadError("No nearest grid locations available.");
-    return;
+      setDownloadError("No nearest grid locations available.");
+      return;
     }
-    
+
     try {
       if (n_neighbors === 1 && nearestGridLocation) {
         const result = await downloadFile(
@@ -62,31 +66,38 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
         );
 
         if (!result.success) {
-          const errorMessage = result.error instanceof Error ? result.error.message : "Download failed";
+          const errorMessage =
+            result.error instanceof Error
+              ? result.error.message
+              : "Download failed";
           setDownloadError(errorMessage);
           return;
         }
 
         onClose();
-      }
-      else if (n_neighbors > 1) {
+      } else if (n_neighbors > 1) {
         const selection = gridLocations.slice(0, n_neighbors);
         if (selection.length < 2) {
-          setDownloadError("Not enough neighbor grid points available for batch download.");
+          setDownloadError(
+            "Not enough neighbor grid points available for batch download."
+          );
           return;
         }
         const result = await downloadBatchFiles(selection);
         if (!result.success) {
-          const errorMessage = result.error instanceof Error ? result.error.message : "Batch download failed";
+          const errorMessage =
+            result.error instanceof Error
+              ? result.error.message
+              : "Batch download failed";
           setDownloadError(errorMessage);
           return;
         }
 
         onClose();
       }
-    }
-    catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unexpected error occurred";
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unexpected error occurred";
       setDownloadError(errorMessage);
     }
   };
@@ -122,15 +133,15 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
       </DialogTitle>
       <DialogContent>
         <DialogContentText id="download-dialog-description" component="div">
-          
           {/* Missing data warning */}
           {!canDownload && (
             <Alert severity="warning" sx={{ mb: 2 }}>
               <Typography variant="body2">
                 <strong>Missing required information</strong>
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1, fontSize: '0.85em' }}>
-                Please select a location and data model from the settings before downloading.
+              <Typography variant="body2" sx={{ mt: 1, fontSize: "0.85em" }}>
+                Please select a location and data model from the settings before
+                downloading.
               </Typography>
             </Alert>
           )}
@@ -138,10 +149,11 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
           {/* Selected coordinates */}
           {canDownload && lat !== undefined && lng !== undefined && (
             <Typography variant="body2" sx={{ mb: 1 }}>
-              <strong>Selected Coordinates:</strong> ({formatCoordinate(lat)}, {formatCoordinate(lng)})
+              <strong>Selected Coordinates:</strong> ({formatCoordinate(lat)},{" "}
+              {formatCoordinate(lng)})
             </Typography>
           )}
-          
+
           {/* Grid location loading */}
           {isLoadingGridLocation && (
             <Box sx={{ mb: 1 }}>
@@ -149,7 +161,12 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
                 <strong>Data Grid Coordinates:</strong>
               </Typography>
               <Skeleton variant="text" width="60%" height={20} />
-              <Skeleton variant="text" width="80%" height={16} sx={{ mt: 0.5 }} />
+              <Skeleton
+                variant="text"
+                width="80%"
+                height={16}
+                sx={{ mt: 0.5 }}
+              />
             </Box>
           )}
 
@@ -157,9 +174,10 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
           {gridLocationError && (
             <Alert severity="error" sx={{ mb: 2 }}>
               <Typography variant="body2">
-                <strong>Failed to fetch grid location:</strong> {gridLocationError}
+                <strong>Failed to fetch grid location:</strong>{" "}
+                {gridLocationError}
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1, fontSize: '0.85em' }}>
+              <Typography variant="body2" sx={{ mt: 1, fontSize: "0.85em" }}>
                 Please try again or contact support if the problem persists.
               </Typography>
             </Alert>
@@ -171,7 +189,7 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
               <Typography variant="body2">
                 <strong>Download failed:</strong> {downloadError}
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1, fontSize: '0.85em' }}>
+              <Typography variant="body2" sx={{ mt: 1, fontSize: "0.85em" }}>
                 Please try again.
               </Typography>
             </Alert>
@@ -181,19 +199,23 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
           {nearestGridLocation && !isLoadingGridLocation && (
             <Box sx={{ mb: 1 }}>
               <Typography variant="body2">
-                <strong>Data Grid Coordinates:</strong> ({formatCoordinate(nearestGridLocation.latitude)}, {formatCoordinate(nearestGridLocation.longitude)})
+                <strong>Data Grid Coordinates:</strong> (
+                {formatCoordinate(nearestGridLocation.latitude)},{" "}
+                {formatCoordinate(nearestGridLocation.longitude)})
               </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontSize: '0.9em', 
-                  color: '#666', 
-                  fontStyle: 'italic',
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "0.9em",
+                  color: "#666",
+                  fontStyle: "italic",
                   mt: 0.5,
-                  mb: 1
+                  mb: 1,
                 }}
               >
-                Note: Wind data is available at specific grid points. The download will contain data from the nearest grid point to your selected location.
+                Note: Wind data is available at specific grid points. The
+                download will contain data from the nearest grid point to your
+                selected location.
               </Typography>
             </Box>
           )}
@@ -212,20 +234,22 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
                 <Typography variant="body2" sx={{ mb: 1 }}>
                   <strong>Data Source:</strong> {downloadInfo.description}
                 </Typography>
-                
+
                 <Typography variant="body2" sx={{ mb: 1 }}>
                   <strong>Year Range:</strong> {downloadInfo.year_range}
                 </Typography>
 
                 {downloadInfo.wind_speed_heights && (
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>Windspeed Heights:</strong> {downloadInfo.wind_speed_heights.join(", ")}
+                    <strong>Windspeed Heights:</strong>{" "}
+                    {downloadInfo.wind_speed_heights.join(", ")}
                   </Typography>
                 )}
 
                 {downloadInfo.wind_direction_heights && (
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>Wind Direction Heights:</strong> {downloadInfo.wind_direction_heights.join(", ")}
+                    <strong>Wind Direction Heights:</strong>{" "}
+                    {downloadInfo.wind_direction_heights.join(", ")}
                   </Typography>
                 )}
               </>
@@ -235,7 +259,7 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
           {/* Download progress */}
           {isDownloading && (
             <Alert severity="info" sx={{ mt: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <CircularProgress size={16} sx={{ mr: 1 }} />
                 <Typography variant="body2">
                   Preparing your download... This may take a few moments.
@@ -246,22 +270,26 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button 
+        <Button
           onClick={handleClose}
           variant="outlined"
           sx={{ textTransform: "none" }}
         >
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={handleAction}
           variant="contained"
           disabled={!canConfirm}
           sx={{ textTransform: "none" }}
         >
-          {isDownloading ? 'Downloading...' :
-          isLoadingGridLocation ? 'Loading...' : 
-           hasError ? 'Retry' : 'Download'}
+          {isDownloading
+            ? "Downloading..."
+            : isLoadingGridLocation
+              ? "Loading..."
+              : hasError
+                ? "Retry"
+                : "Download"}
         </Button>
       </DialogActions>
     </Dialog>

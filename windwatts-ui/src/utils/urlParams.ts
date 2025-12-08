@@ -154,7 +154,8 @@ export function buildUrlFromSettings(settings: {
     settings.windspeedUnit !== URL_PARAM_DEFAULTS.windspeedUnit
   ) {
     // Convert "m/s" to "ms" for URL compatibility
-    const urlValue = settings.windspeedUnit === "m/s" ? "ms" : settings.windspeedUnit;
+    const urlValue =
+      settings.windspeedUnit === "m/s" ? "ms" : settings.windspeedUnit;
     params.set("windspeedUnit", urlValue);
   }
 
