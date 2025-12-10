@@ -298,20 +298,20 @@ def _get_energy_production_core(
         raise HTTPException(status_code=404, detail="Data not found")
     
     if period == 'all':
-        summary_avg_energy_production = power_curve_manager.fetch_avg_energy_production_summary(df, height, selected_powercurve)
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
         return {"energy_production": summary_avg_energy_production['Average year']['kWh produced']}
     
     elif period == 'summary':
-        summary_avg_energy_production = power_curve_manager.fetch_avg_energy_production_summary(df, height, selected_powercurve)
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
         return {"summary_avg_energy_production": summary_avg_energy_production}
     
     elif period == 'annual':
-        yearly_avg_energy_production = power_curve_manager.fetch_yearly_avg_energy_production(df, height, selected_powercurve)
+        yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, selected_powercurve)
         return {"yearly_avg_energy_production": yearly_avg_energy_production}
     
     elif period == 'combined':
-        summary_avg_energy_production = power_curve_manager.fetch_avg_energy_production_summary(df, height, selected_powercurve)
-        yearly_avg_energy_production = power_curve_manager.fetch_yearly_avg_energy_production(df, height, selected_powercurve)
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
+        yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, selected_powercurve)
         return {
             "energy_production": summary_avg_energy_production['Average year']['kWh produced'],
             "summary_avg_energy_production": summary_avg_energy_production,
