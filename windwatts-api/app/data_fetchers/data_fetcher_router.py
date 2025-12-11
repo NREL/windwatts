@@ -27,6 +27,7 @@ class DataFetcherRouter:
                 lat (float): Latitude of the location
                 lng (float): Longitude of the location
                 height (int): Heights in meters
+                period (str): Average type for Athena fetchers
             key: The key of the fetcher to use
 
         Returns:
@@ -34,7 +35,11 @@ class DataFetcherRouter:
         """
         fetcher = self.fetchers.get(key)
         if fetcher:
-            return fetcher.fetch_data(**params)
+            # Convert 'period' to 'avg_type' for Athena fetchers
+            fetcher_params = params.copy()
+            if 'period' in fetcher_params:
+                fetcher_params['avg_type'] = fetcher_params.pop('period')
+            return fetcher.fetch_data(**fetcher_params)
         else:
             raise ValueError(f"No fetcher found for key={key}")
     def fetch_data_routing(self, params: dict, source: str = "athena_wtk"):

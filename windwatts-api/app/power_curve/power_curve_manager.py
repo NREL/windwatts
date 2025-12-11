@@ -348,7 +348,7 @@ class PowerCurveManager:
             For global quantiles (no year), returns a single pseudo-row with year=None.
             pd.Dataframe
         """
-        prod_df = self.fetch_energy_production_df(df, height, selected_power_curve)
+        prod_df = self.compute_energy_production_df(df, height, selected_power_curve)
         ws_column = f'windspeed_{height}m'
         kw_column = f'windspeed_{height}m_kw'
 
