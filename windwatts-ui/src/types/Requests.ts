@@ -6,7 +6,6 @@ export interface WindspeedByLatLngRequest {
   lng: number;
   hubHeight: number;
   dataModel: DataModel;
-  ensemble?: boolean;
 }
 
 export interface EnergyProductionRequest {
@@ -16,7 +15,6 @@ export interface EnergyProductionRequest {
   powerCurve: string;
   dataModel: DataModel;
   time_period?: string;
-  ensemble?: boolean;
 }
 
 export interface NearestGridLocationRequest {

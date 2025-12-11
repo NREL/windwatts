@@ -8,7 +8,6 @@ export interface UrlParams {
   hubHeight?: number;
   powerCurve?: string;
   dataModel?: DataModel;
-  ensemble?: boolean;
   lossAssumption?: number;
   partnerId?: string;
   windspeedUnit?: string;
@@ -19,7 +18,6 @@ export const URL_PARAM_DEFAULTS = {
   hubHeight: 40,
   powerCurve: "nlr-reference-100kW",
   dataModel: "era5" as DataModel,
-  ensemble: false,
   lossAssumption: 0,
   windspeedUnit: "mph",
 };
@@ -67,15 +65,8 @@ export function parseUrlParams(searchParams?: URLSearchParams): UrlParams {
   }
 
   const dataModel = params.get("dataModel");
-  if (dataModel === "era5" || dataModel === "wtk") {
+  if (dataModel === "era5" || dataModel === "wtk" || dataModel === "ensemble") {
     result.dataModel = dataModel;
-  }
-
-  const ensemble = params.get("ensemble");
-  if (ensemble === "true") {
-    result.ensemble = true;
-  } else if (ensemble === "false") {
-    result.ensemble = false;
   }
 
   const lossAssumption = params.get("lossAssumption");
@@ -107,7 +98,6 @@ export function buildUrlFromSettings(settings: {
   hubHeight: number;
   powerCurve: string;
   preferredModel: DataModel;
-  ensemble: boolean;
   lossAssumptionPercent: number;
   windspeedUnit: string;
 }): string {
@@ -135,10 +125,6 @@ export function buildUrlFromSettings(settings: {
 
   if (settings.preferredModel !== URL_PARAM_DEFAULTS.dataModel) {
     params.set("dataModel", settings.preferredModel);
-  }
-
-  if (settings.ensemble) {
-    params.set("ensemble", "true");
   }
 
   if (settings.lossAssumptionPercent > 0) {

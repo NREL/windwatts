@@ -27,12 +27,12 @@ import { convertOutput, getOutOfBoundsMessage } from "../../utils";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { OutOfBoundsWarning } from "../shared";
 import { useProductionData } from "../../hooks";
-import { SettingsContext } from "../../providers/SettingsContext";
+// import { SettingsContext } from "../../providers/SettingsContext";
 
 export const ProductionCard = memo(() => {
   const [expanded, setExpanded] = useState(false);
   const { units } = useContext(UnitsContext);
-  const { preferredModel } = useContext(SettingsContext);
+  // const { preferredModel } = useContext(SettingsContext);
   const {
     productionData,
     isLoading,
@@ -45,19 +45,21 @@ export const ProductionCard = memo(() => {
   } = useProductionData();
 
   const title = "Production";
+  // Always show ERA5 in the subheader since production always uses ERA5 data
+  const productionModelDisplay = dataModel.toUpperCase();
   const subheader = (
     <>
       Estimated Annual Production Potential from{" "}
       <Link
         href={
-          DATA_MODEL_INFO[preferredModel]?.source_href ||
+          DATA_MODEL_INFO[dataModel]?.source_href ||
           DATA_MODEL_INFO.era5.source_href
         }
         target="_blank"
         rel="noopener noreferrer"
         underline="hover"
       >
-        {preferredModel.toUpperCase()} Model
+        {productionModelDisplay} Model
       </Link>
     </>
   );

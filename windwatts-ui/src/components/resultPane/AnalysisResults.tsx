@@ -9,14 +9,14 @@ import { DataSourceLinks } from "./DataSourceLinks";
 import { useOutputUnit } from "../../hooks";
 
 export const AnalysisResults = () => {
-  const { ensemble, preferredModel } = useContext(SettingsContext);
+  const { preferredModel } = useContext(SettingsContext);
 
   useOutputUnit(); // auto-switches between kWh and MWh
 
   return (
     <Stack spacing={2}>
       {/* Top row: either Wind Speed + Resource, or Ensemble Model tiles */}
-      {ensemble ? (
+      {preferredModel === "ensemble" ? (
         <>
           <Divider
             textAlign="center"

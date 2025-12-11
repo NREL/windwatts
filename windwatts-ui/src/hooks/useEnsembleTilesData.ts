@@ -10,7 +10,6 @@ export const useEnsembleTilesData = () => {
     hubHeight,
     powerCurve,
     preferredModel: dataModel,
-    ensemble,
     lossAssumptionFactor,
   } = useContext(SettingsContext);
 
@@ -23,7 +22,7 @@ export const useEnsembleTilesData = () => {
     hubHeight &&
     powerCurve &&
     dataModel &&
-    ensemble &&
+    dataModel === "ensemble" &&
     !outOfBounds
   );
 
@@ -35,9 +34,8 @@ export const useEnsembleTilesData = () => {
       hubHeight,
       powerCurve,
       dataModel,
-      ensemble,
     });
-  }, [shouldFetch, lat, lng, hubHeight, powerCurve, dataModel, ensemble]);
+  }, [shouldFetch, lat, lng, hubHeight, powerCurve, dataModel]);
 
   const { isLoading, data, error } = useSWR(
     swrKey,
@@ -48,7 +46,6 @@ export const useEnsembleTilesData = () => {
           lng: lng!,
           hubHeight,
           dataModel,
-          ensemble,
         }),
         getEnergyProduction({
           lat: lat!,
@@ -57,7 +54,6 @@ export const useEnsembleTilesData = () => {
           powerCurve,
           dataModel,
           time_period: "all",
-          ensemble,
         }),
       ]);
       return { wind, prod };
