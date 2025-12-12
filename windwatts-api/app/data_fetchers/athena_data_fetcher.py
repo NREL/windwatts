@@ -56,7 +56,7 @@ class AthenaDataFetcher(AbstractDataFetcher):
         else:
             raise ValueError(f"Invalid period: {period}")
     
-    def fetch_raw_data(self, lat: float, lng: float, height: int):
+    def fetch_raw(self, lat: float, lng: float, height: int):
         """
         Fetch raw, unaggregated wind data (DataFrame) using the configured client.
 

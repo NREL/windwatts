@@ -268,7 +268,7 @@ def _get_energy_production_core(
         "lng": lng,
         "height": height
     }
-    df = data_fetcher_router.fetch_raw_data(params, key=source)
+    df = data_fetcher_router.fetch_raw(params, key=source)
     if df is None:
         raise HTTPException(status_code=404, detail="Data not found")
 

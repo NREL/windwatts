@@ -39,7 +39,7 @@ class DataFetcherRouter:
         else:
             raise ValueError(f"No fetcher found for key={key}")
     
-    def fetch_raw_data(self, params: dict, key: str = "athena_wtk"):
+    def fetch_raw(self, params: dict, key: str = "athena_wtk"):
         """
         Fetch raw, unaggregated data (DataFrame) using specified data fetcher.
 
@@ -55,7 +55,7 @@ class DataFetcherRouter:
         """
         fetcher = self.fetchers.get(key)
         if fetcher:
-            return fetcher.fetch_raw_data(**params)
+            return fetcher.fetch_raw(**params)
         else:
             raise ValueError(f"No fetcher found for key={key}")
     def fetch_data_routing(self, params: dict, source: str = "athena_wtk"):
