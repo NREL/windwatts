@@ -109,7 +109,7 @@ def get_production_core(
     }
     
     key = f"{source}_{model}"
-    df = data_fetcher_router.fetch_raw_data(params, key=key)
+    df = data_fetcher_router.fetch_raw(params, key=key)
     if df is None:
         raise HTTPException(status_code=404, detail="Data not found")
     
