@@ -14,7 +14,7 @@ export interface EnergyProductionRequest {
   hubHeight: number;
   powerCurve: string;
   dataModel: DataModel;
-  time_period?: string;
+  period?: string;
 }
 
 export interface NearestGridLocationRequest {

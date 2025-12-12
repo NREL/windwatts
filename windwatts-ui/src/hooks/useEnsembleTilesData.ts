@@ -53,7 +53,7 @@ export const useEnsembleTilesData = () => {
           hubHeight,
           powerCurve,
           dataModel,
-          time_period: "all",
+          period: "all",
         }),
       ]);
       return { wind, prod };
