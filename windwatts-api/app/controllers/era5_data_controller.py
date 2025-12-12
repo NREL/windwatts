@@ -56,7 +56,7 @@ if not _skip_data_init:
 VALID_AVG_TYPES = {
     "athena_era5": {
         "wind_speed": ["all", "annual", "none"],
-        "production": ["all", "summary", "annual", "combined", "none"],
+        "production": ["all", "summary", "annual", "full", "none"],
     },
     "athena_ensemble": {
         "wind_speed": ["all", "none"],
@@ -309,7 +309,7 @@ def _get_energy_production_core(
         yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, selected_powercurve)
         return {"yearly_avg_energy_production": yearly_avg_energy_production}
     
-    elif period == 'combined':
+    elif period == 'full':
         summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
         yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, selected_powercurve)
         return {

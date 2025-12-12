@@ -12,7 +12,7 @@ MODEL_CONFIG = {
         "default_source": "athena",
         "period_type": {
             "windspeed": ["all", "annual"],
-            "production": ["all", "summary", "annual"]
+            "production": ["all", "summary", "annual", "full"]
         },
         "years": {
             "full": list(range(2013, 2024)),
@@ -25,7 +25,7 @@ MODEL_CONFIG = {
         "default_source": "athena",
         "period_type": {
             "windspeed": ["all", "annual", "monthly", "hourly"],
-            "production": ["all", "summary", "annual", "monthly"]
+            "production": ["all", "summary", "annual", "monthly", "full"]
         },
         "years": {
             "full": list(range(2000, 2021)),

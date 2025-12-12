@@ -30,7 +30,7 @@ export const useProductionData = () => {
       hubHeight,
       powerCurve,
       dataModel,
-      time_period: "all",
+      time_period: "full",
     });
   }, [shouldFetch, lat, lng, hubHeight, powerCurve, dataModel]);
 
@@ -43,7 +43,7 @@ export const useProductionData = () => {
         hubHeight,
         powerCurve,
         dataModel,
-        time_period: "all",
+        time_period: "full",
       }),
     {
       revalidateOnFocus: false,

@@ -115,19 +115,24 @@ def get_production_core(
     
     if period == 'all':
         summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, powercurve)
+        return {"energy_production": summary_avg_energy_production['Average year']['kWh produced']}
+    
+    elif period == 'summary':
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, powercurve)
+        return {"summary_avg_energy_production": summary_avg_energy_production}
+    
+    elif period == 'annual':
+        yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, powercurve)
+        return {"yearly_avg_energy_production": yearly_avg_energy_production}
+    
+    elif period == 'full':
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, powercurve)
         yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, powercurve)
         return {
             "energy_production": summary_avg_energy_production['Average year']['kWh produced'],
             "summary_avg_energy_production": summary_avg_energy_production,
             "yearly_avg_energy_production": yearly_avg_energy_production
-        }
-    elif period == 'summary':
-        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, powercurve)
-        print(summary_avg_energy_production)
-        return {"energy_production": summary_avg_energy_production['Average year']['kWh produced']}
-    elif period == 'annual':
-        yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, powercurve)
-        return {"yearly_avg_energy_production": yearly_avg_energy_production}        
+        }        
 
 def get_timeseries_core(
     model: str,
