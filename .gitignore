@@ -1,4 +1,42 @@
+.DS_Store
+__pycache__
+dist/
+dw_tap.egg-info/
+saved.png
+templates/served/*
+outputs/*
+static/raw/*
+proto.out
+templates/12x24_index.html
+templates/bc_index.html
+templates/by_address.html
+templates/info.html
+templates/on_map.html
+templates/ts_index.html
+templates/monthly_index.html
+static/plots/*
+static/completed/*
+templates/on_map3.html
+awscodebuild/.aws/
+awscodebuild/imageDetail.json
+misc/.ipynb_checkpoints/
+data.csv.gz
+location_index.csv
+perfbench_results.csv
+.vscode/
+.env
+.env.*
+windwatts-ui/appfleet-config
+windwatts-api/appfleet-config
+windwatts-ui/release.sh
+windwatts-api/release.sh
+windwatts-ui/env-vars.sh
+windwatts-api/env-vars.sh
+node_modules/
+update-env-credentials.sh
+manage-aws-parameters.sh
+windwatts-ui-ssr/
 
-# Cursor thoughts and plans
+# Cursor thoughts
 thoughts/
-.cursor/plans/
+.thoughts/
