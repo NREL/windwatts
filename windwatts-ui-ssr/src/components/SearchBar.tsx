@@ -17,37 +17,55 @@ export default function SearchBar() {
   const [isPending, startTransition] = useTransition();
   const { toggleSettings } = useContext(SettingsContext);
 
+  // Use refs to access latest values in the event listener without re-initializing Autocomplete
+  const routerRef = useRef(router);
+  const pathnameRef = useRef(pathname);
+  const spRef = useRef(sp);
+
+  useEffect(() => {
+    routerRef.current = router;
+    pathnameRef.current = pathname;
+    spRef.current = sp;
+  }, [router, pathname, sp]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!window.google?.maps?.places) return;
     if (!inputRef.current) return;
 
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(
-      inputRef.current,
-      {
-        types: ["geocode", "establishment"],
-        fields: ["place_id", "geometry", "formatted_address", "name"],
-      }
-    );
+    // Only initialize once
+    if (!autocompleteRef.current) {
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(
+        inputRef.current,
+        {
+          types: ["geocode", "establishment"],
+          fields: ["place_id", "geometry", "formatted_address", "name"],
+        }
+      );
 
-    const listener = autocompleteRef.current.addListener("place_changed", () => {
-      const place = autocompleteRef.current?.getPlace();
-      const loc = place?.geometry?.location;
-      if (!loc) return;
-      const next = new URLSearchParams(sp as any);
-      next.set("lat", loc.lat().toFixed(4));
-      next.set("lng", loc.lng().toFixed(4));
-      setInputValue(place?.formatted_address || "");
-      if (typeof window !== "undefined") {
-        window.history.replaceState(null, "", `${pathname}?${next.toString()}`);
-      }
-      startTransition(() => router.replace(`${pathname}?${next.toString()}`));
-    });
+      autocompleteRef.current.addListener("place_changed", () => {
+        const place = autocompleteRef.current?.getPlace();
+        const loc = place?.geometry?.location;
+        if (!loc) return;
 
+        const currentSp = spRef.current;
+        const currentPathname = pathnameRef.current;
+        const currentRouter = routerRef.current;
+
+        const next = new URLSearchParams(currentSp as any);
+        next.set("lat", loc.lat().toFixed(4));
+        next.set("lng", loc.lng().toFixed(4));
+        setInputValue(place?.formatted_address || "");
+
+        startTransition(() => currentRouter.replace(`${currentPathname}?${next.toString()}`));
+      });
+    }
+
+    // Cleanup not strictly necessary for the instance, but if we wanted to be clean we could clear listeners
     return () => {
-      if (listener) listener.remove();
+      // We keep the instance alive to avoid re-creating it
     };
-  }, [router, pathname, sp]);
+  }, []); // Empty dependency array to run only once on mount
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);

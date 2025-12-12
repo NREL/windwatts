@@ -20,168 +20,169 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [settings, setSettings] = useState<StoredSettings>(() => {
-    const params = parseUrlParams(searchParams);
-    const hasPos = hasLaunchParams(params);
-    return {
-      ...defaultValues,
-      currentPosition:
-        hasPos && params.lat && params.lng
-          ? { lat: params.lat, lng: params.lng }
-          : { lat: 39.7392, lng: -104.9903 },
-      zoom: params.zoom ?? URL_PARAM_DEFAULTS.zoom,
-      hubHeight: params.hubHeight ?? URL_PARAM_DEFAULTS.hubHeight,
-      powerCurve: params.powerCurve ?? URL_PARAM_DEFAULTS.powerCurve,
-      preferredModel: params.dataModel ?? URL_PARAM_DEFAULTS.dataModel,
-      ensemble: params.ensemble ?? URL_PARAM_DEFAULTS.ensemble,
-      lossAssumptionFactor:
-        1 - (params.lossAssumption ?? URL_PARAM_DEFAULTS.lossAssumption) / 100,
-    };
+  const [uiState, setUiState] = useState({
+    settingsOpen: false,
+    resultsOpen: false,
   });
 
-  // Sync settings from URL whenever searchParams change
-  useEffect(() => {
-    const params = parseUrlParams(searchParams);
-    const hasPos = hasLaunchParams(params);
-    setSettings((current) => ({
-      ...current,
-      currentPosition:
-        hasPos && params.lat && params.lng
-          ? { lat: params.lat, lng: params.lng }
-          : { lat: 39.7392, lng: -104.9903 },
-      zoom: params.zoom ?? URL_PARAM_DEFAULTS.zoom,
-      hubHeight: params.hubHeight ?? URL_PARAM_DEFAULTS.hubHeight,
-      powerCurve: params.powerCurve ?? URL_PARAM_DEFAULTS.powerCurve,
-      preferredModel: params.dataModel ?? URL_PARAM_DEFAULTS.dataModel,
-      ensemble: params.ensemble ?? URL_PARAM_DEFAULTS.ensemble,
-      lossAssumptionFactor:
-        1 - (params.lossAssumption ?? URL_PARAM_DEFAULTS.lossAssumption) / 100,
-    }));
-  }, [searchParams]);
+  const toggleSettings = useCallback(() => {
+    setUiState((prev) => ({ ...prev, settingsOpen: !prev.settingsOpen }));
+  }, []);
 
-  // Normalize URL whenever settings change, only if different from current
-  useEffect(() => {
-    const next = new URLSearchParams(searchParams as any);
-    const position = settings.currentPosition ?? { lat: 39.7392, lng: -104.9903 };
-    next.set("lat", position.lat.toFixed(4));
-    next.set("lng", position.lng.toFixed(4));
-    next.set("zoom", Math.round(settings.zoom).toString());
-    next.set("hubHeight", String(settings.hubHeight));
-    next.set("powerCurve", settings.powerCurve);
-    next.set("dataModel", settings.preferredModel);
-    next.set("ensemble", settings.ensemble ? "true" : "false");
-    next.set(
-      "lossAssumption",
-      String(Math.max(0, Math.min(100, Math.round((1 - settings.lossAssumptionFactor) * 100))))
-    );
+  const toggleResults = useCallback(() => {
+    setUiState((prev) => ({ ...prev, resultsOpen: !prev.resultsOpen }));
+  }, []);
 
-    const target = `${pathname}?${next.toString()}`;
-    const current = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ""}`;
-    if (target !== current) router.replace(target);
-  }, [router, pathname, searchParams, settings]);
+  // Derive state directly from searchParams to avoid synchronization loops
+  const params = useMemo(() => parseUrlParams(searchParams), [searchParams]);
+  const hasPos = hasLaunchParams(params);
+
+  const currentPosition = useMemo(
+    () =>
+      hasPos && params.lat && params.lng
+        ? { lat: params.lat, lng: params.lng }
+        : { lat: 39.7392, lng: -104.9903 },
+    [hasPos, params.lat, params.lng]
+  );
+
+  const zoom = params.zoom ?? URL_PARAM_DEFAULTS.zoom;
+  const hubHeight = params.hubHeight ?? URL_PARAM_DEFAULTS.hubHeight;
+  const powerCurve = params.powerCurve ?? URL_PARAM_DEFAULTS.powerCurve;
+  const preferredModel = params.dataModel ?? URL_PARAM_DEFAULTS.dataModel;
+  const ensemble = params.ensemble ?? URL_PARAM_DEFAULTS.ensemble;
+  const lossAssumptionFactor =
+    1 - (params.lossAssumption ?? URL_PARAM_DEFAULTS.lossAssumption) / 100;
+
+  const updateUrl = useCallback(
+    (updates: Record<string, string>) => {
+      const next = new URLSearchParams(searchParams as any);
+      Object.entries(updates).forEach(([key, value]) => {
+        next.set(key, value);
+      });
+      router.replace(`${pathname}?${next.toString()}`);
+    },
+    [router, pathname, searchParams]
+  );
 
   const setCurrentPosition = useCallback(
     (
       position:
         | CurrentPosition
         | null
-        | ((prev: CurrentPosition | null) => CurrentPosition | null),
+        | ((prev: CurrentPosition | null) => CurrentPosition | null)
     ) => {
-      setSettings((current) => ({
-        ...current,
-        currentPosition:
-          typeof position === "function"
-            ? position(current.currentPosition)
-            : position || { lat: 39.7392, lng: -104.9903 },
-      }));
+      let newPos: CurrentPosition | null;
+      if (typeof position === "function") {
+        newPos = position(currentPosition);
+      } else {
+        newPos = position;
+      }
+
+      if (newPos) {
+        updateUrl({
+          lat: newPos.lat.toFixed(4),
+          lng: newPos.lng.toFixed(4),
+        });
+      }
     },
-    []
+    [currentPosition, updateUrl]
   );
 
-  const setZoom = useCallback((zoom: number) => {
-    setSettings((current) => ({ ...current, zoom: Math.round(zoom) }));
-  }, []);
+  const setZoom = useCallback(
+    (newZoom: number) => {
+      updateUrl({ zoom: Math.round(newZoom).toString() });
+    },
+    [updateUrl]
+  );
 
-  const setHubHeight = useCallback((height: number) => {
-    setSettings((current) => ({ ...current, hubHeight: height }));
-  }, []);
+  const setHubHeight = useCallback(
+    (height: number) => {
+      updateUrl({ hubHeight: String(height) });
+    },
+    [updateUrl]
+  );
 
-  const setPowerCurve = useCallback((curve: string) => {
-    setSettings((current) => ({ ...current, powerCurve: curve }));
-  }, []);
+  const setPowerCurve = useCallback(
+    (curve: string) => {
+      updateUrl({ powerCurve: curve });
+    },
+    [updateUrl]
+  );
 
-  const setPreferredModel = useCallback((model: DataModel) => {
-    setSettings((current) => ({ ...current, preferredModel: model }));
-  }, []);
+  const setPreferredModel = useCallback(
+    (model: DataModel) => {
+      updateUrl({ dataModel: model });
+    },
+    [updateUrl]
+  );
 
-  const setEnsemble = useCallback((ensemble: boolean) => {
-    setSettings((current) => ({ ...current, ensemble }));
-  }, []);
+  const setEnsemble = useCallback(
+    (newEnsemble: boolean) => {
+      updateUrl({ ensemble: newEnsemble ? "true" : "false" });
+    },
+    [updateUrl]
+  );
 
-  const setLossAssumptionFactor = useCallback((factor: number) => {
-    const clamped = Math.max(0, Math.min(1, Number(factor)));
-    setSettings((current) => ({ ...current, lossAssumptionFactor: clamped }));
-  }, []);
+  const setLossAssumptionFactor = useCallback(
+    (factor: number) => {
+      const clamped = Math.max(0, Math.min(1, Number(factor)));
+      const val = Math.round((1 - clamped) * 100);
+      updateUrl({ lossAssumption: String(val) });
+    },
+    [updateUrl]
+  );
 
   const setLossAssumptionPercent = useCallback(
     (percent: number) => {
       const num = Math.max(0, Math.min(100, Number(percent)));
-      const factor = (100 - num) / 100;
-      setLossAssumptionFactor(factor);
+      updateUrl({ lossAssumption: String(num) });
     },
-    [setLossAssumptionFactor]
+    [updateUrl]
   );
-
-  const toggleSettings = useCallback(() => {
-    setSettings((current) => ({
-      ...current,
-      settingsOpen: !current.settingsOpen,
-    } as any));
-  }, []);
-
-  const toggleResults = useCallback(() => {
-    setSettings((current) => ({ ...current, resultsOpen: !current.resultsOpen }));
-  }, []);
 
   const contextValue = useMemo(
     () => ({
-      settingsOpen: (settings as any).settingsOpen,
+      settingsOpen: uiState.settingsOpen,
       toggleSettings,
-      resultsOpen: (settings as any).resultsOpen,
+      resultsOpen: uiState.resultsOpen,
       toggleResults,
-      currentPosition: settings.currentPosition,
+      currentPosition,
       setCurrentPosition,
-      zoom: settings.zoom,
+      zoom,
       setZoom,
-      hubHeight: settings.hubHeight,
+      hubHeight,
       setHubHeight,
-      powerCurve: settings.powerCurve,
+      powerCurve,
       setPowerCurve,
-      preferredModel: settings.preferredModel,
+      preferredModel,
       setPreferredModel,
-      ensemble: settings.ensemble,
+      ensemble,
       setEnsemble,
-      lossAssumptionFactor:
-        settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor,
-      lossAssumptionPercent: Math.round(
-        (1 - (settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor)) *
-        100
-      ),
+      lossAssumptionFactor,
+      lossAssumptionPercent: Math.round((1 - lossAssumptionFactor) * 100),
       setLossAssumptionFactor,
       setLossAssumptionPercent,
     }),
     [
-      settings,
+      uiState.settingsOpen,
+      toggleSettings,
+      uiState.resultsOpen,
+      toggleResults,
+      currentPosition,
       setCurrentPosition,
+      zoom,
       setZoom,
+      hubHeight,
       setHubHeight,
+      powerCurve,
       setPowerCurve,
+      preferredModel,
       setPreferredModel,
+      ensemble,
       setEnsemble,
+      lossAssumptionFactor,
       setLossAssumptionFactor,
       setLossAssumptionPercent,
-      toggleSettings,
-      toggleResults,
     ]
   );
 
