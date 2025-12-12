@@ -20,26 +20,42 @@ class DataFetcherRouter:
 
     def fetch_data(self, params: dict , key: str = "athena_wtk"):
         """
-        Fetch data using specified data fetcher.
+        Fetch aggregated data using specified data fetcher.
 
         Args:
             params (dict): The parameters to pass to the fetcher, including
                 lat (float): Latitude of the location
                 lng (float): Longitude of the location
                 height (int): Heights in meters
-                period (str): Average type for Athena fetchers
+                period (str): Aggregation period (all, annual, monthly, hourly)
             key: The key of the fetcher to use
 
         Returns:
-            dict: The fetched data as a dictionary.
+            dict: The fetched aggregated data.
         """
         fetcher = self.fetchers.get(key)
         if fetcher:
-            # Convert 'period' to 'avg_type' for Athena fetchers
-            fetcher_params = params.copy()
-            if 'period' in fetcher_params:
-                fetcher_params['avg_type'] = fetcher_params.pop('period')
-            return fetcher.fetch_data(**fetcher_params)
+            return fetcher.fetch_data(**params)
+        else:
+            raise ValueError(f"No fetcher found for key={key}")
+    
+    def fetch_raw_data(self, params: dict, key: str = "athena_wtk"):
+        """
+        Fetch raw, unaggregated data (DataFrame) using specified data fetcher.
+
+        Args:
+            params (dict): The parameters to pass to the fetcher, including
+                lat (float): Latitude of the location
+                lng (float): Longitude of the location
+                height (int): Heights in meters
+            key: The key of the fetcher to use
+
+        Returns:
+            DataFrame: Raw data without aggregation.
+        """
+        fetcher = self.fetchers.get(key)
+        if fetcher:
+            return fetcher.fetch_raw_data(**params)
         else:
             raise ValueError(f"No fetcher found for key={key}")
     def fetch_data_routing(self, params: dict, source: str = "athena_wtk"):

@@ -101,16 +101,15 @@ def get_production_core(
     source = validate_source(model, source)
     period = validate_period_type(model, period, "production")
 
-    # Always fetch raw data (period='none') for production calculations
+    # Always fetch raw data for production calculations
     params = {
         "lat": lat,
         "lng": lng,
-        "height": height,
-        "period": "none"
+        "height": height
     }
     
     key = f"{source}_{model}"
-    df = data_fetcher_router.fetch_data(params, key=key)
+    df = data_fetcher_router.fetch_raw_data(params, key=key)
     if df is None:
         raise HTTPException(status_code=404, detail="Data not found")
     

@@ -27,45 +27,48 @@ class AthenaDataFetcher(AbstractDataFetcher):
         else:
             raise ValueError(f"Unsupported base dataset: {self.base_type}")
 
-    def fetch_data(self, lat: float, lng: float, height: int, avg_type: str = 'global') -> dict:
+    def fetch_data(self, lat: float, lng: float, height: int, period: str = 'all') -> dict:
         """
-        Fetch wind data using the configured client.
+        Fetch aggregated wind data using the configured client.
 
         Args:
             lat (float): Latitude of the location.
             lng (float): Longitude of the location.
             height (int): Height in meters.
-            avg_type (str): Average type to fetch.
-                For 'wtk': ['global', 'yearly', 'monthly', 'hourly', 'none']
-                For 'era5': ['global', 'yearly', 'none']
+            period (str): Aggregation period to fetch.
+                For 'wtk': ['all', 'annual', 'monthly', 'hourly']
+                For 'era5': ['all', 'annual']
 
         Returns:
-            dict: Fetched wind data.
+            dict: Fetched aggregated wind data.
 
         Raises:
-            ValueError: If the avg_type is not supported for the selected client.
+            ValueError: If the period is not supported for the selected client.
         """
-        # valid_avg_types_params = {
-        #     'wtk': ['global', 'yearly', 'monthly', 'hourly', 'none'],
-        #     'era5': ['global', 'yearly', 'none'],
-        #     'era5_bc': ['global','none']
-        # }
-
-        # if avg_type not in valid_avg_types_params[self.source_key]:
-        #     raise ValueError(f"avg_type '{avg_type}' is not supported for data type '{self.data_type}'")
-
-        if avg_type == 'none':
-            return self.client.fetch_df(lat=lat, long=lng, height=height)
-        elif avg_type == 'all':
+        if period == 'all':
             return self.client.fetch_global_avg_at_height(lat=lat, long=lng, height=height)
-        elif avg_type == 'annual':
+        elif period == 'annual':
             return self.client.fetch_yearly_avg_at_height(lat=lat, long=lng, height=height)
-        elif avg_type == 'monthly':
+        elif period == 'monthly':
             return self.client.fetch_monthly_avg_at_height(lat=lat, long=lng, height=height)
-        elif avg_type == 'hourly':
+        elif period == 'hourly':
             return self.client.fetch_hourly_avg_at_height(lat=lat, long=lng, height=height)
         else:
-            raise ValueError(f"Invalid avg_type: {avg_type}")
+            raise ValueError(f"Invalid period: {period}")
+    
+    def fetch_raw_data(self, lat: float, lng: float, height: int):
+        """
+        Fetch raw, unaggregated wind data (DataFrame) using the configured client.
+
+        Args:
+            lat (float): Latitude of the location.
+            lng (float): Longitude of the location.
+            height (int): Height in meters.
+
+        Returns:
+            DataFrame: Raw wind data without aggregation.
+        """
+        return self.client.fetch_df(lat=lat, long=lng, height=height)
     
     def find_nearest_locations(self, lat: float, lng: float, n_neighbors: int = 1):
         """
