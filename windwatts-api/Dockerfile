@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Download and install windwatts_data.whl from s3
 ARG WINDWATTS_DATA_URL
-ARG WINDWATTS_DATA_VERSION=1.0.4
+ARG WINDWATTS_DATA_VERSION=1.0.4.1
 ARG WINDWATTS_DATA_FILE=windwatts_data-${WINDWATTS_DATA_VERSION}-py3-none-any.whl
 ENV WINDWATTS_DATA_URL=${WINDWATTS_DATA_URL}
 RUN curl -o /tmp/windwatts_data-${WINDWATTS_DATA_VERSION}-py3-none-any.whl ${WINDWATTS_DATA_URL}${WINDWATTS_DATA_FILE} && \

@@ -22,7 +22,8 @@ MODEL_CONFIG = {
         "grid_info": { "min_lat":23.402, "min_long":-137.725, 
                       "max_lat":51.403, "max_long":-44.224,
                       "spatial_resolution" : "31 km", "temporal_resolution": "1 hour"},
-        "references" : ["https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"]
+        "links" : ["https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"],
+        "references": []
     },
     "wtk": {
         "sources": ["athena", "s3"],
@@ -39,7 +40,8 @@ MODEL_CONFIG = {
         "grid_info": { "min_lat":7.75129, "min_long":-179.99918, 
                       "max_lat":78.392685, "max_long":180.0,
                       "spatial_resolution" : "2 km", "temporal_resolution": "1 hour"},
-        "references" : ["https://www.nrel.gov/grid/wind-toolkit"]
+        "links" : ["https://www.nrel.gov/grid/wind-toolkit"],
+        "references": []
     },
     "ensemble": {
         "sources": ["athena"],
@@ -56,6 +58,7 @@ MODEL_CONFIG = {
         "grid_info": { "min_lat":23.402, "min_long":-137.725, 
                       "max_lat":51.403, "max_long":-44.224,
                       "spatial_resolution" : "31 km", "temporal_resolution": "1 hour"},
-        "references" : ["Manuscript in preparation (publication pending) - National Laboratory of the Rockies"]
+        "links" : [],
+        "references" : ["Manuscript in preparation (publication pending), please contact windwatts@nrel.gov for any questions."]
     }
 }

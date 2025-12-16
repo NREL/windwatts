@@ -299,6 +299,7 @@ def get_model_info(
             "available_years": config.get("years", {}),
             "available_heights": config.get("heights", []),
             "grid_info": config.get("grid_info", {}),
+            "links": config.get("links", []),
             "references": config.get("references",[])
         }
     except HTTPException:
