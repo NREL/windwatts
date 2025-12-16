@@ -293,11 +293,13 @@ def get_model_info(
         
         return {
             "model": model,
-            "available_sources": config["sources"],
-            "default_source": config["default_source"],
+            # "available_sources": config["sources"],
+            # "default_source": config["default_source"],
             "supported_periods": config["period_type"],
             "available_years": config.get("years", {}),
-            "available_heights": config.get("heights", [])
+            "available_heights": config.get("heights", []),
+            "grid_info": config.get("grid_info", {}),
+            "references": config.get("references",[])
         }
     except HTTPException:
         raise

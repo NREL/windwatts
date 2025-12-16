@@ -48,8 +48,23 @@ class MonthlyWindSpeedResponse(BaseModel):
         }
     }
 
+class HourlyWindSpeedResponse(BaseModel):
+    hourly_avg: ValueMapNumericList
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "hourly_avg": [
+                    {"hour": 0, "windspeed_100m": 5.12},
+                    {"hour": 2, "windspeed_100m": 5.45},
+                    {"hour": 10, "windspeed_100m": 6.10}
+                ]
+            }
+        }
+    }
+
 # Union type for wind speed responses - FastAPI will show all examples
-WindSpeedResponse = Union[GlobalWindSpeedResponse, YearlyWindSpeedResponse, MonthlyWindSpeedResponse]
+WindSpeedResponse = Union[GlobalWindSpeedResponse, YearlyWindSpeedResponse, MonthlyWindSpeedResponse, HourlyWindSpeedResponse]
 
 class AvailablePowerCurvesResponse(BaseModel):
     available_power_curves: List[str]

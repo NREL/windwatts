@@ -125,6 +125,10 @@ def get_production_core(
         yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, powercurve)
         return {"yearly_avg_energy_production": yearly_avg_energy_production}
     
+    elif period == 'monthly':
+        monthly_avg_energy_production = power_curve_manager.calculate_monthly_energy_production(df, height, powercurve)
+        return {"monthly_avg_energy_production": monthly_avg_energy_production}
+    
     elif period == 'full':
         summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, powercurve)
         yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, powercurve)
