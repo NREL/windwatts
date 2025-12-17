@@ -3,18 +3,21 @@ import { Paper, Typography, FormControlLabel, Switch } from "@mui/material";
 import { SettingsContext } from "../../providers/SettingsContext";
 
 export const EnsembleSettings = () => {
-  const { ensemble, setEnsemble } = useContext(SettingsContext);
+  const { preferredModel, setPreferredModel } = useContext(SettingsContext);
+
   return (
     <>
-      <Typography variant="subtitle1" gutterBottom>
+      <Typography variant="h6" gutterBottom mt={2}>
         Experimental
       </Typography>
       <Paper sx={{ p: 2 }} variant="outlined">
         <FormControlLabel
           control={
             <Switch
-              checked={!!ensemble}
-              onChange={(e) => setEnsemble(e.target.checked)}
+              checked={preferredModel === "ensemble"}
+              onChange={(e) =>
+                setPreferredModel(e.target.checked ? "ensemble" : "era5")
+              }
             />
           }
           label="Enable Ensemble Model"

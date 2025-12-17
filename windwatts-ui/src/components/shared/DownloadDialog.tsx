@@ -32,9 +32,9 @@ export const DownloadDialog = ({ onClose }: { onClose: () => void }) => {
     retry: retryGridLocation,
   } = useNearestGridLocation(n_neighbors);
 
-  const { currentPosition, preferredModel: dataModel } =
-    useContext(SettingsContext);
+  const { currentPosition, preferredModel } = useContext(SettingsContext);
   const { lat, lng } = currentPosition || {};
+  const dataModel = preferredModel === "ensemble" ? "era5" : preferredModel;
   const downloadInfo = dataModel ? DATA_MODEL_INFO[dataModel] : null;
 
   const nearestGridLocation =

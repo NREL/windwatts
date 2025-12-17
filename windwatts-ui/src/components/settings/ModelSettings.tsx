@@ -53,6 +53,9 @@ export function ModelSettings() {
             <ToggleButton value="era5">
               <Typography variant="body2">ERA5</Typography>
             </ToggleButton>
+            <ToggleButton value="ensemble">
+              <Typography variant="body2">Ensemble</Typography>
+            </ToggleButton>
           </SettingToggleButtonGroup>
         </Box>
       </Box>

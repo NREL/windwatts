@@ -150,9 +150,9 @@ def _get_windspeed_core(
         "lat": lat,
         "lng": lng,
         "height": height,
-        "avg_type": avg_type
+        "period": avg_type
     }
-    data = data_fetcher_router.fetch_data(params, source=source)
+    data = data_fetcher_router.fetch_data(params, key=source)
     if data is None:
         raise HTTPException(status_code=404, detail="Data not found")
     return data
@@ -266,28 +266,27 @@ def _get_energy_production_core(
     params = {
         "lat": lat,
         "lng": lng,
-        "height": height,
-        "avg_type": "none"
+        "height": height
     }
-    df = data_fetcher_router.fetch_data(params, source=source)
+    df = data_fetcher_router.fetch_raw(params, key=source)
     if df is None:
         raise HTTPException(status_code=404, detail="Data not found")
 
-    if time_period == 'global':
-        summary_avg_energy_production = power_curve_manager.fetch_avg_energy_production_summary(df, height, selected_powercurve)
+    if time_period == 'all':
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
         return {"energy_production": summary_avg_energy_production['Average year']['kWh produced']}
     
     elif time_period == 'summary':
-        summary_avg_energy_production = power_curve_manager.fetch_avg_energy_production_summary(df, height, selected_powercurve)
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
         return {"summary_avg_energy_production": summary_avg_energy_production}
     
     elif time_period == 'yearly':
-        yearly_avg_energy_production = power_curve_manager.fetch_yearly_avg_energy_production(df, height, selected_powercurve)
+        yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, selected_powercurve)
         return {"yearly_avg_energy_production": yearly_avg_energy_production}
     
-    elif time_period == 'all':
-        summary_avg_energy_production = power_curve_manager.fetch_avg_energy_production_summary(df, height, selected_powercurve)
-        yearly_avg_energy_production = power_curve_manager.fetch_yearly_avg_energy_production(df, height, selected_powercurve)
+    elif time_period == 'full':
+        summary_avg_energy_production = power_curve_manager.calculate_energy_production_summary(df, height, selected_powercurve)
+        yearly_avg_energy_production = power_curve_manager.calculate_yearly_energy_production(df, height, selected_powercurve)
         return {
             "energy_production": summary_avg_energy_production['Average year']['kWh produced'],
             "summary_avg_energy_production": summary_avg_energy_production,
@@ -355,7 +354,7 @@ def _download_csv_core(
         "years": years
     }
 
-    df = data_fetcher_router.fetch_data(params, source=source)
+    df = data_fetcher_router.fetch_data(params, key=source)
 
     if df is None or df.empty:
         raise HTTPException(status_code=404, detail="No data found for the specified parameters")

@@ -1,4 +1,4 @@
-export type DataModel = "wtk" | "era5";
+export type DataModel = "wtk" | "era5" | "ensemble";
 
 export type DataModelInfo = {
   label: string;

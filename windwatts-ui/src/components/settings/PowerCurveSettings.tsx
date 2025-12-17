@@ -17,11 +17,9 @@ export function PowerCurveSettings() {
   const { powerCurve, setPowerCurve } = useContext(SettingsContext);
 
   // Fetch available power curves from the API
-  const { data } = useSWR(
-    "/api/wtk/available-powercurves",
-    getAvailablePowerCurves,
-    { fallbackData: { available_power_curves: DefaultPowerCurveOptions } }
-  );
+  const { data } = useSWR("/api/v1/powercurves", getAvailablePowerCurves, {
+    fallbackData: { available_power_curves: DefaultPowerCurveOptions },
+  });
 
   const powerCurveOptions: string[] = data?.available_power_curves || [];
 

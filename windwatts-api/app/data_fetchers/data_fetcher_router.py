@@ -8,36 +8,56 @@ class DataFetcherRouter:
         """
         self.fetchers = {}
 
-    def register_fetcher(self, fetcher_name: str, fetcher: AbstractDataFetcher):
+    def register_fetcher(self, key: str, fetcher: AbstractDataFetcher):
         """
         Register a data fetcher with the router.
 
         Args:
-            fetcher_name (str): The name of the fetcher.
+            key (str): The key of the fetcher.
             fetcher: The fetcher object.
         """
-        self.fetchers[fetcher_name] = fetcher
+        self.fetchers[key] = fetcher
 
-    def fetch_data(self, params: dict , source: str = "athena_wtk"):
+    def fetch_data(self, params: dict , key: str = "athena_wtk"):
         """
-        Fetch data using specified data fetcher.
+        Fetch aggregated data using specified data fetcher.
 
         Args:
             params (dict): The parameters to pass to the fetcher, including
                 lat (float): Latitude of the location
                 lng (float): Longitude of the location
                 height (int): Heights in meters
-            source (str): The name of the fetcher to use
+                period (str): Aggregation period (all, annual, monthly, hourly)
+            key: The key of the fetcher to use
 
         Returns:
-            dict: The fetched data as a dictionary.
+            dict: The fetched aggregated data.
         """
-        fetcher = self.fetchers.get(source)
+        fetcher = self.fetchers.get(key)
         if fetcher:
             return fetcher.fetch_data(**params)
         else:
-            raise ValueError(f"No fetcher found for source={source}")
+            raise ValueError(f"No fetcher found for key={key}")
+    
+    def fetch_raw(self, params: dict, key: str = "athena_wtk"):
+        """
+        Fetch raw, unaggregated data (DataFrame) using specified data fetcher.
 
+        Args:
+            params (dict): The parameters to pass to the fetcher, including
+                lat (float): Latitude of the location
+                lng (float): Longitude of the location
+                height (int): Heights in meters
+            key: The key of the fetcher to use
+
+        Returns:
+            DataFrame: Raw data without aggregation.
+        """
+        fetcher = self.fetchers.get(key)
+        if fetcher:
+            return fetcher.fetch_raw(**params)
+        else:
+            raise ValueError(f"No fetcher found for key={key}")
     def fetch_data_routing(self, params: dict, source: str = "athena_wtk"):
         """
         Fetch data using the appropriate data fetcher through routing logics.
