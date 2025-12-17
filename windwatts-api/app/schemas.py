@@ -210,14 +210,31 @@ class TimeseriesBatchRequest(BaseModel):
     }
 
 class ModelInfoResponse(BaseModel):
-    model: str = Field(..., description="Data model name (e.g., era5, wtk, ensemble)")
-    supported_periods: Dict[str, List[str]] = Field(...,description="Supported period types for windspeed/production")
-    available_years: Dict[str, List[int]] = Field(default_factory=dict,description="Available year sets (e.g., full/sample) and their year lists")
-    available_heights: List[int] = Field(default_factory=list,description="Supported hub heights in meters")
-    grid_info: Dict[str, AlphaNumeric] = Field(default_factory=dict,description="Metadata about the model grid (bounds, resolution, etc.)")
-    links: List[str] = Field(default_factory=list,description="List of related documentation or UI links")
-    references: List[str] = Field(default_factory=list,description="List of reference URLs or citations for the data source")
-
+    model: str = Field(..., description="Data model name")
+    supported_periods: Dict[str, List[str]] = Field(
+        default_factory=dict, 
+        description="Supported aggregation periods for windspeed/ production"
+    )
+    available_years: List[int] = Field(
+        ..., 
+        description="Available years for timeseries data"
+    )
+    available_heights: List[int] = Field(
+        ...,
+        description="Supported hub heights (in meters)"
+    )
+    grid_info: Dict[str, AlphaNumeric] = Field(
+        default_factory=dict,
+        description="Metadata about the model grid (bounds, resolution, etc.)"
+    )
+    references: List[str] = Field(
+        ...,
+        description="References of relevant publications or documents"
+    )
+    links: List[str] = Field(
+        ...,
+        description="Links to data sources or relevant resources"
+    )
     model_config = {
         "json_schema_extra": {
             "example": {
@@ -226,24 +243,21 @@ class ModelInfoResponse(BaseModel):
                     "windspeed": ["all", "annual"],
                     "production": ["all", "summary", "annual", "full"]
                 },
-                "available_years": {
-                    "full": [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
-                    "sample": [2020, 2021, 2022, 2023]
-                },
+                "available_years":[2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
                 "available_heights": [30, 40, 50, 60, 80, 100],
                 "grid_info": {
                     "min_lat": 23.402,
                     "min_long": -137.725,
                     "max_lat": 51.403,
                     "max_long": -44.224,
-                    "spatial resolution": "31 km",
-                    "temporal resolution": "1 hour"
+                    "spatial_resolution": "31 km",
+                    "temporal_resolution": "1 hour"
                 },
                 "links": [
                     "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"
                 ],
                 "references": [
-                    "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"
+                    'Phillips, C., L. M. Sheridan, P. Conry, D. K. Fytanidis, D. Duplyakin, S. Zisman, N. Duboc, M. Nelson, R. Kotamarthi, R. Linn, M. Broersma, T. Spijkerboer, and H. Tinnesand. 2022. "Evaluation of Obstacle Modelling Approaches for Resource Assessment and Small Wind Turbine Siting: Case Study in the Northern Netherlands." Wind Energy Science 7: 1153-1169. https://doi.org/10.5194/wes-7-1153-2022'
                 ]
             }
         }

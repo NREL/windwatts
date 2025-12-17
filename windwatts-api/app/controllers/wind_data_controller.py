@@ -298,7 +298,7 @@ def get_model_info(
             # "available_sources": config["sources"],
             # "default_source": config["default_source"],
             "supported_periods": config["period_type"],
-            "available_years": config.get("years", {}),
+            "available_years": config.get("years", {}).get("full",[]),
             "available_heights": config.get("heights", []),
             "grid_info": config.get("grid_info", {}),
             "links": config.get("links", []),

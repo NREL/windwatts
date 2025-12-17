@@ -23,7 +23,9 @@ MODEL_CONFIG = {
                       "max_lat":51.403, "max_long":-44.224,
                       "spatial_resolution" : "31 km", "temporal_resolution": "1 hour"},
         "links" : ["https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"],
-        "references": []
+        "references": [
+                'Phillips, C., L. M. Sheridan, P. Conry, D. K. Fytanidis, D. Duplyakin, S. Zisman, N. Duboc, M. Nelson, R. Kotamarthi, R. Linn, M. Broersma, T. Spijkerboer, and H. Tinnesand. 2022. "Evaluation of Obstacle Modelling Approaches for Resource Assessment and Small Wind Turbine Siting: Case Study in the Northern Netherlands." Wind Energy Science 7: 1153-1169. https://doi.org/10.5194/wes-7-1153-2022'
+        ]
     },
     "wtk": {
         "sources": ["athena", "s3"],
@@ -41,7 +43,11 @@ MODEL_CONFIG = {
                       "max_lat":78.392685, "max_long":180.0,
                       "spatial_resolution" : "2 km", "temporal_resolution": "1 hour"},
         "links" : ["https://www.nrel.gov/grid/wind-toolkit"],
-        "references": []
+        "references": [
+            'Draxl, C., B.M. Hodge, A. Clifton, and J. McCaa. 2015. Overview and Meteorological Validation of the Wind Integration National Dataset Toolkit (Technical Report, NREL/TP-5000-61740). Golden, CO: National Laboratory of the Rockies',
+            'Draxl, C., B.M. Hodge, A. Clifton, and J. McCaa. 2015. "The Wind Integration National Dataset (WIND) Toolkit." Applied Energy 151: 355366',
+            'King, J., A. Clifton, and B.M. Hodge. 2014. Validation of Power Output for the WIND Toolkit (Technical Report, NREL/TP-5D00-61714). Golden, CO: National Laboratory of the Rockies'
+        ]
     },
     "ensemble": {
         "sources": ["athena"],
