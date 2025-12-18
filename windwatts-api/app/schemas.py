@@ -81,12 +81,27 @@ class AvailablePowerCurvesResponse(BaseModel):
     }
 
 # Energy production response models for different time_periods
-class SummaryEnergyProductionResponse(BaseModel):
+class AllEnergyProductionResponse(BaseModel):
     energy_production: Numeric = Field(description="global-averaged kWh produced")
 
     model_config = {
         "json_schema_extra": {
             "example": {"energy_production": 12345.67}
+        }
+    }
+
+class SummaryEnergyProductionResponse(BaseModel):
+    summary_avg_energy_production: Dict[str, ValueMapAlphaNumericNone]
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "summary_avg_energy_production": {
+                    "Lowest year": {"year": 2015, "Average wind speed (m/s)": "5.36", "kWh produced": 202791},
+                    "Average year": {"year": None, "Average wind speed (m/s)": "5.86", "kWh produced": 267712},
+                    "Highest year": {"year": 2014, "Average wind speed (m/s)": "6.32", "kWh produced": 326354}
+                }
+            }
         }
     }
 
@@ -104,7 +119,7 @@ class YearlyEnergyProductionResponse(BaseModel):
         }
     }
 
-class AllEnergyProductionResponse(BaseModel):
+class FullEnergyProductionResponse(BaseModel):
     energy_production: Numeric = Field(description="global-averaged kWh produced")
     summary_avg_energy_production: Dict[str, ValueMapAlphaNumericNone]
     yearly_avg_energy_production: Dict[str, ValueMapAlphaNumeric]
@@ -140,7 +155,7 @@ class MonthlyEnergyProductionResponse(BaseModel):
     }
 
 # Union type for energy production responses
-EnergyProductionResponse = Union[SummaryEnergyProductionResponse, YearlyEnergyProductionResponse, AllEnergyProductionResponse, MonthlyEnergyProductionResponse]
+EnergyProductionResponse = Union[AllEnergyProductionResponse, SummaryEnergyProductionResponse, YearlyEnergyProductionResponse, FullEnergyProductionResponse, MonthlyEnergyProductionResponse]
 
 class HealthCheckResponse(BaseModel):
     status: Literal["up"] = "up"

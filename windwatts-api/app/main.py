@@ -15,19 +15,19 @@ from app.schemas import HealthCheckResponse
 
 app = FastAPI(
     title="WindWatts API",
-    version="0.1.0",
+    version="1.0.0",
     root_path="/api",
     description=dedent(
         """
         Welcome to NLR's WindWatts API.
 
-        - Rate limits: 1000 requests per minute per IP.
+        - Rate limits: tiered - 10 / 100 / 1000 requests per minute per IP.
         - Base path: `/api`
         - Contact: windwatts@nrel.gov
 
         ## API Versions
 
-        **v1 (Recommended)**: Unified endpoints with model as path parameter
+        **v1 (Recommended)**:
         - `/v1/{model}/windspeed` - Wind speed data
         - `/v1/{model}/production` - Energy production estimates
         - `/v1/{model}/timeseries` - Raw timeseries downloads
