@@ -87,7 +87,7 @@ If you prefer running services directly:
 
 ```shell
 conda env create
-conda activate dw-tap-api
+conda activate windwatts
 python api.py --development
 ```
 
