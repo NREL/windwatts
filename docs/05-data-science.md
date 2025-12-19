@@ -50,7 +50,7 @@ We use quantile-based aggregation to compress hourly data while preserving distr
 
 Currently focused on the continental United States.
 
-![ERA5 Coverage](../docs/about/era5-coverage.png)
+![ERA5 Coverage](about/era5-coverage.png)
 
 ### Data Flow
 
