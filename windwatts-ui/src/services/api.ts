@@ -21,15 +21,14 @@ export const fetchBlobWrapper = async (url: string, options: RequestInit) => {
   }
   return response;
 };
-// time_period = "global" is default for windspeed in the era5_controller. But have to include "source" param as "athena_ensemble" for ensemble model result and "athena_era5" for regular era5 result which is default anyway.
+// V1 API: Uses unified endpoint with model as path parameter
 export const getWindspeedByLatLong = async ({
   lat,
   lng,
   hubHeight,
   dataModel,
-  ensemble,
 }: WindspeedByLatLngRequest) => {
-  const url = `/api/${dataModel}/windspeed?lat=${lat}&lng=${lng}&height=${hubHeight}${ensemble ? "&ensemble=true" : ""}`;
+  const url = `/api/v1/${dataModel}/windspeed?lat=${lat}&lng=${lng}&height=${hubHeight}`;
   const options = {
     method: "GET",
     headers: {
@@ -39,18 +38,17 @@ export const getWindspeedByLatLong = async ({
   return fetchWrapper(url, options);
 };
 
-// time_period = "all" works for era5 but have to add source param as "athena_era5" ("athena_era5" is default in era5_data_controller as source)
-// time_period = "global" works for the ensemble model to fetch single global production value but have to add source as "athena_ensemble". Key is "energy_production" to get value.
+// V1 API:
+// period options: "all" (default), "summary", "annual", "monthly" (varies by model)
 export const getEnergyProduction = async ({
   lat,
   lng,
   hubHeight,
   powerCurve,
   dataModel,
-  time_period = "all",
-  ensemble,
+  period = "all",
 }: EnergyProductionRequest) => {
-  const url = `/api/${dataModel}/energy-production?lat=${lat}&lng=${lng}&height=${hubHeight}&selected_powercurve=${powerCurve}&time_period=${time_period}${ensemble ? "&ensemble=true" : ""}`;
+  const url = `/api/v1/${dataModel}/production?lat=${lat}&lng=${lng}&height=${hubHeight}&powercurve=${powerCurve}&period=${period}`;
   const options = {
     method: "GET",
     headers: {
@@ -73,8 +71,9 @@ export const getEnergyProduction = async ({
 //   return fetchWrapper(url, options);
 // };
 
+// V1 API: Power curves are model-agnostic
 export const getAvailablePowerCurves = async () => {
-  const url = `/api/era5/available-powercurves`; // if fetching from era5, replace the wtk with era5
+  const url = `/api/v1/powercurves`;
   const options = {
     method: "GET",
     headers: {
@@ -84,13 +83,14 @@ export const getAvailablePowerCurves = async () => {
   return fetchWrapper(url, options);
 };
 
+// V1 API: Grid points lookup
 export const getNearestGridLocation = async ({
   lat,
   lng,
   n_neighbors = 1,
   dataModel,
 }: NearestGridLocationRequest) => {
-  const url = `/api/${dataModel}/nearest-locations?lat=${lat}&lng=${lng}&n_neighbors=${n_neighbors}`;
+  const url = `/api/v1/${dataModel}/grid-points?lat=${lat}&lng=${lng}&limit=${n_neighbors}`;
   const options = {
     method: "GET",
     headers: {
@@ -100,11 +100,12 @@ export const getNearestGridLocation = async ({
   return fetchWrapper(url, options);
 };
 
+// V1 API: Single timeseries CSV download (default source is s3)
 export const getCSVFile = async ({
   gridIndex,
   dataModel,
 }: WindCSVFileRequest) => {
-  const url = `/api/${dataModel}/download-csv?gridIndex=${gridIndex}`;
+  const url = `/api/v1/${dataModel}/timeseries?gridIndex=${gridIndex}`;
 
   const options = {
     method: "GET",
@@ -116,18 +117,21 @@ export const getCSVFile = async ({
   return fetchBlobWrapper(url, options);
 };
 
+// V1 API: Batch timeseries CSV download as ZIP
 export const getBatchCSVFiles = async ({
   gridLocations,
   dataModel,
 }: WindCSVFilesRequest) => {
-  const url = `/api/${dataModel}/download-csv-batch`;
+  const url = `/api/v1/${dataModel}/timeseries/batch`;
 
   const options = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ locations: gridLocations }),
+    body: JSON.stringify({
+      locations: gridLocations,
+    }),
   };
 
   return fetchBlobWrapper(url, options);

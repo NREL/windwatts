@@ -25,3 +25,18 @@ class AbstractDataFetcher(ABC):
             dict: A dictionary containing the fetched data
         """
         pass
+
+    @abstractmethod
+    def fetch_raw(self, lat: float, lng: float, height: int):
+        """
+        Fetch raw data.
+        
+        Args:
+            lat (float): Latitude of the location
+            lng (float): Longitude of the location
+            height (int): Height in integer
+
+        Returns:
+            DataFrame: Raw data without aggregation
+        """
+        pass

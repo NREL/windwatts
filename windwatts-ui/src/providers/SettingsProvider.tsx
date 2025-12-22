@@ -42,7 +42,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         hubHeight: urlParams.hubHeight ?? URL_PARAM_DEFAULTS.hubHeight,
         powerCurve: urlParams.powerCurve ?? URL_PARAM_DEFAULTS.powerCurve,
         preferredModel: urlParams.dataModel ?? URL_PARAM_DEFAULTS.dataModel,
-        ensemble: urlParams.ensemble ?? URL_PARAM_DEFAULTS.ensemble,
         lossAssumptionFactor:
           urlParams.lossAssumption !== undefined
             ? percentToFactor(urlParams.lossAssumption)
@@ -75,7 +74,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       hubHeight: settings.hubHeight,
       powerCurve: settings.powerCurve,
       preferredModel: settings.preferredModel,
-      ensemble: settings.ensemble,
       lossAssumptionPercent: Math.round(
         (1 - settings.lossAssumptionFactor) * 100
       ),
@@ -92,7 +90,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     settings.hubHeight,
     settings.powerCurve,
     settings.preferredModel,
-    settings.ensemble,
     settings.lossAssumptionFactor,
     settings.windspeedUnit,
   ]);
@@ -134,13 +131,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const setPreferredModel = useCallback(
     (model: DataModel) => {
       setSettings((current) => ({ ...current, preferredModel: model }));
-    },
-    [setSettings]
-  );
-
-  const setEnsemble = useCallback(
-    (ensemble: boolean) => {
-      setSettings((current) => ({ ...current, ensemble }));
     },
     [setSettings]
   );
@@ -200,8 +190,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       setPowerCurve,
       preferredModel: settings.preferredModel,
       setPreferredModel,
-      ensemble: settings.ensemble,
-      setEnsemble,
       lossAssumptionFactor:
         settings.lossAssumptionFactor ?? defaultValues.lossAssumptionFactor,
       lossAssumptionPercent: Math.round(
@@ -223,7 +211,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       settings.hubHeight,
       settings.powerCurve,
       settings.preferredModel,
-      settings.ensemble,
       settings.lossAssumptionFactor,
       settings.windspeedUnit,
       toggleSettings,
@@ -233,7 +220,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       setHubHeight,
       setPowerCurve,
       setPreferredModel,
-      setEnsemble,
       setLossAssumptionFactor,
       setLossAssumptionPercent,
       setWindspeedUnit,

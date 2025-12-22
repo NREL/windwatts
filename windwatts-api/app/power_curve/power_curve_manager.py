@@ -279,7 +279,7 @@ class PowerCurveManager:
         mid_df[f"{ws_col}_kw"] = power_curve.windspeed_to_kw(mid_df, ws_col)
         return mid_df
 
-    def fetch_energy_production_df(self, df: pd.DataFrame, height: int, selected_power_curve: str, relevant_columns_only: bool = True) -> pd.DataFrame:
+    def compute_energy_production_df(self, df: pd.DataFrame, height: int, selected_power_curve: str, relevant_columns_only: bool = True) -> pd.DataFrame:
         """
         Computes energy production dataframe using the selected power curve.
 
@@ -348,7 +348,7 @@ class PowerCurveManager:
             For global quantiles (no year), returns a single pseudo-row with year=None.
             pd.Dataframe
         """
-        prod_df = self.fetch_energy_production_df(df, height, selected_power_curve)
+        prod_df = self.compute_energy_production_df(df, height, selected_power_curve)
         ws_column = f'windspeed_{height}m'
         kw_column = f'windspeed_{height}m_kw'
 
@@ -400,7 +400,7 @@ class PowerCurveManager:
         res.sort_values("Average wind speed (m/s)", inplace=True, ignore_index=True)
         return res
     
-    def fetch_yearly_avg_energy_production(self, df: pd.DataFrame, height: int, selected_power_curve: str) -> dict:
+    def calculate_yearly_energy_production(self, df: pd.DataFrame, height: int, selected_power_curve: str) -> dict:
         """
         Computes yearly average energy production and windspeed.
 
@@ -432,7 +432,7 @@ class PowerCurveManager:
 
         return result
     
-    def fetch_avg_energy_production_summary(self, df: pd.DataFrame, height: int, selected_power_curve: str) -> dict:
+    def calculate_energy_production_summary(self, df: pd.DataFrame, height: int, selected_power_curve: str) -> dict:
         """
         Computes yearly average energy production and windspeed summary.
 
@@ -476,7 +476,7 @@ class PowerCurveManager:
         res_summary = res_summary.replace({np.nan: None})
         return res_summary.to_dict(orient="index")
 
-    def fetch_monthly_avg_energy_production(self, df: pd.DataFrame, height: int, selected_power_curve: str) -> dict:
+    def calculate_monthly_energy_production(self, df: pd.DataFrame, height: int, selected_power_curve: str) -> dict:
         """
         Computes monthly average energy production.
 
@@ -496,7 +496,7 @@ class PowerCurveManager:
         schema = self._classify_schema(df)
         if schema != DatasetSchema.TIMESERIES:
             raise ValueError("Monthly averages are only supported for time-series (TIMESERIES) inputs.")
-        prod_df = self.fetch_energy_production_df(df, height, selected_power_curve)
+        prod_df = self.compute_energy_production_df(df, height, selected_power_curve)
        
         ws_column = f'windspeed_{height}m'
         kw_column = f'windspeed_{height}m_kw'

@@ -8,7 +8,7 @@ import { convertWindspeed, convertOutput, getWindResource } from "../../utils";
 // Compact, card-less variant for embedding in the top row - using ensemble model
 export const EnsembleTiles = memo(() => {
   const { units } = useContext(UnitsContext);
-  const { ensemble } = useContext(SettingsContext);
+  const { preferredModel } = useContext(SettingsContext);
 
   const {
     windData,
@@ -18,7 +18,7 @@ export const EnsembleTiles = memo(() => {
     hasData,
   } = useEnsembleTilesData();
 
-  if (!ensemble) return null;
+  if (preferredModel !== "ensemble") return null;
 
   const loading = isTilesLoading;
   const hasDataCombined = hasData;

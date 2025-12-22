@@ -6,7 +6,7 @@ import { useEnsembleTilesData } from "./useEnsembleTilesData";
 import { KEY_AVERAGE_YEAR, KEY_KWH_PRODUCED } from "../constants";
 
 export const useOutputUnit = () => {
-  const { ensemble } = useContext(SettingsContext);
+  const { preferredModel } = useContext(SettingsContext);
   const { updateUnit } = useContext(UnitsContext);
   const { productionData: prodData } = useProductionData();
   const { productionData: ensembleData } = useEnsembleTilesData();
@@ -20,7 +20,7 @@ export const useOutputUnit = () => {
 
     let shouldUseMWh = false;
 
-    if (ensemble) {
+    if (preferredModel === "ensemble") {
       // ensemble mode - auto-convert if either output >= 10,000
       const ensembleProduction = Number(ensembleData?.energy_production || 0);
       shouldUseMWh = ensembleProduction >= 10000 || prodAvg >= 10000;
@@ -30,5 +30,5 @@ export const useOutputUnit = () => {
     }
 
     updateUnit("output", shouldUseMWh ? "MWh" : "kWh");
-  }, [ensemble, prodData, ensembleData, updateUnit]);
+  }, [preferredModel, prodData, ensembleData, updateUnit]);
 };

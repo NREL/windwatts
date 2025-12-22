@@ -56,7 +56,7 @@ class S3DataFetcher(AbstractDataFetcher):
         
         return keys
     
-    def fetch_s3_file(self, key: str, cols: Optional[List[str]]):
+    def fetch_raw(self, key: str, cols: Optional[List[str]]):
         """
         Download + parse a single gzip CSV from S3.
 
@@ -102,7 +102,7 @@ class S3DataFetcher(AbstractDataFetcher):
         workers = min(MIN_POOL_WORKERS, len(keys))
 
         with ThreadPoolExecutor(max_workers=workers) as ex:
-            futures = [ex.submit(self.fetch_s3_file, k, cols) for k in keys]
+            futures = [ex.submit(self.fetch_raw, k, cols) for k in keys]
             for f in as_completed(futures):
                 df = f.result()
                 if df is not None and not df.empty:

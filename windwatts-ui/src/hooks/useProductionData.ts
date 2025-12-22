@@ -10,9 +10,11 @@ export const useProductionData = () => {
     currentPosition,
     hubHeight,
     powerCurve,
-    preferredModel: dataModel,
+    preferredModel,
     lossAssumptionFactor,
   } = useContext(SettingsContext);
+  // Always use ERA5 for production calculations, even when ensemble is selected
+  const dataModel = preferredModel === "ensemble" ? "era5" : preferredModel;
   const { lat, lng } = currentPosition || {};
   const outOfBounds =
     lat && lng && dataModel ? isOutOfBounds(lat, lng, dataModel) : false;
@@ -28,7 +30,7 @@ export const useProductionData = () => {
       hubHeight,
       powerCurve,
       dataModel,
-      time_period: "all",
+      period: "full",
     });
   }, [shouldFetch, lat, lng, hubHeight, powerCurve, dataModel]);
 
@@ -41,7 +43,7 @@ export const useProductionData = () => {
         hubHeight,
         powerCurve,
         dataModel,
-        time_period: "all",
+        period: "full",
       }),
     {
       revalidateOnFocus: false,

@@ -1,3 +1,6 @@
+from pathlib import Path
 from app.power_curve.power_curve_manager import PowerCurveManager
 
-power_curve_manager = PowerCurveManager("./app/power_curve/powercurves")
+# Get the directory of this file and construct path to powercurves
+_current_dir = Path(__file__).parent
+power_curve_manager = PowerCurveManager(str(_current_dir / "powercurves"))
