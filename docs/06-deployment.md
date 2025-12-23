@@ -7,13 +7,13 @@ This assumes Docker is available on the host.
 ### Build
 
 ```shell
-docker build -t tap-api:latest .
+docker build -t windwatts-api:latest .
 ```
 
 ### Run (Production Mode)
 
 ```shell
-docker run -p 8080:80 -it tap-api:latest uvicorn app.main:app --host 0.0.0.0 --port 80 --workers 4
+docker run -p 8080:80 -it windwatts-api:latest uvicorn app.main:app --host 0.0.0.0 --port 80 --workers 4
 ```
 
 Inside the container, the FastAPI app runs on port `80`. On the host, it's mapped to `8080`.
@@ -23,7 +23,7 @@ Inside the container, the FastAPI app runs on port `80`. On the host, it's mappe
 To explore the container:
 
 ```shell
-docker run -p 8080:80 -it tap-api:latest /bin/bash
+docker run -p 8080:80 -it windwatts-api:latest /bin/bash
 ```
 
 ## Production Configuration
