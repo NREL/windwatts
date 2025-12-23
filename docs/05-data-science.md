@@ -54,5 +54,5 @@ Currently focused on the continental United States.
 
 ### Data Flow
 
-![Data Flow](../docs/about/windwatts-data-flow.png)
+![Data Flow](about/windwatts-data-flow.png)
 
