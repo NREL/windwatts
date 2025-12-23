@@ -16,7 +16,7 @@ docker build -t tap-api:latest .
 docker run -p 8080:80 -it tap-api:latest uvicorn app.main:app --host 0.0.0.0 --port 80 --workers 4
 ```
 
-Inside the container, the Flask app runs on port `80`. On the host, it's mapped to `8080`.
+Inside the container, the FastAPI app runs on port `80`. On the host, it's mapped to `8080`.
 
 ### Troubleshooting
 
