@@ -5,8 +5,9 @@ messages = [
     "Goodbye, World!",
     "I am a message!",
     "This is a message!",
-    "Random message!"
+    "Random message!",
 ]
+
 
 def random_message():
     return random.choice(messages)

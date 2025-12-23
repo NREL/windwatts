@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, DateTime, JSON, Text, Float, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, JSON, Text
 from sqlalchemy.sql import func
 from .connection import Base
+
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"

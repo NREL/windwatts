@@ -1,6 +1,7 @@
 import json
 from .abstract_data_fetcher import AbstractDataFetcher
 
+
 class DataFetcherRouter:
     def __init__(self):
         """
@@ -18,7 +19,7 @@ class DataFetcherRouter:
         """
         self.fetchers[fetcher_name] = fetcher
 
-    def fetch_data(self, params: dict , source: str = "athena_wtk"):
+    def fetch_data(self, params: dict, source: str = "athena_wtk"):
         """
         Fetch data using specified data fetcher.
 
