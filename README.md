@@ -1,6 +1,6 @@
 # WindWatts
 
-WindWatts is a distributed wind resource assessment tool developed by NREL. It provides processed wind speed data, energy production estimates, and visualizations for locations across the United States.
+WindWatts is a distributed wind resource assessment developed by NLR (formerly NREL). It provides processed wind speed data, energy production estimates, and visualizations for locations across the United States.
 
 ## Documentation
 
@@ -8,11 +8,11 @@ Full documentation for developers, data scientists, and DevOps engineers is avai
 
 ### Quick Links
 
--   [**Quickstart Guide**](docs/02-quickstart.md): Get the app running in < 15 minutes.
--   [**Backend API**](docs/03-backend.md): Python/FastAPI development.
--   [**Frontend UI**](docs/04-frontend.md): React/Vite development.
--   [**Data Science**](docs/05-data-science.md): ERA5 data and core logic.
--   [**Deployment**](docs/06-deployment.md): Production setup.
+- [**Quickstart Guide**](docs/02-quickstart.md): Get the app running in < 15 minutes.
+- [**Backend API**](docs/03-backend.md): Python/FastAPI development.
+- [**Frontend UI**](docs/04-frontend.md): React/Vite development.
+- [**Data Science**](docs/05-data-science.md): ERA5 data and core logic.
+- [**Deployment**](docs/06-deployment.md): Production setup.
 
 ## Contributing
 
