@@ -20,10 +20,20 @@ The `windwatts_data` package is a large dependency stored in S3. It is not in Py
 If you are running locally without Docker, you must download and install it manually:
 
 ```bash
-# Example for installing the wheel manually (check Dockerfile for exact URL/version)
+# Download the wheel from S3 (check Dockerfile for exact URL/version)
 curl -O https://windwatts-era5.s3.us-west-2.amazonaws.com/windwatts_data-1.0.4-py3-none-any.whl
+
+# Verify the SHA256 checksum for integrity
+# Expected checksum should be obtained from a trusted source (e.g., project maintainers)
+# Example verification:
+sha256sum windwatts_data-1.0.4-py3-none-any.whl
+# Compare the output with the expected checksum before proceeding
+
+# Install the wheel after verification
 pip install windwatts_data-1.0.4-py3-none-any.whl
 ```
+
+**Security Note**: Always verify the integrity of the downloaded wheel file before installation. Contact the project maintainers to obtain the expected SHA256 checksum for the version you're installing. This protects against compromised or modified files.
 
 ### Makefile Targets
 

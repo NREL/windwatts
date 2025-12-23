@@ -27,6 +27,8 @@ Create a `.env` file in the root:
 
 ```plaintext
 WINDWATTS_DATA_URL=https://windwatts-era5.s3.us-west-2.amazonaws.com/
+# Optional but recommended for production: Add checksum for integrity verification
+# WINDWATTS_DATA_SHA256=<expected_sha256_checksum>
 AWS_ACCESS_KEY_ID="YOUR_AWS_ACCESS_KEY_ID"
 AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_ACCESS_KEY"
 AWS_SESSION_TOKEN="YOUR_AWS_SESSION_TOKEN"

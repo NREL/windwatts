@@ -7,8 +7,19 @@ This assumes Docker is available on the host.
 ### Build
 
 ```shell
-docker build -t tap-api:latest .
+# Build with checksum verification (recommended for production)
+docker build \
+  --build-arg WINDWATTS_DATA_URL=https://windwatts-era5.s3.us-west-2.amazonaws.com/ \
+  --build-arg WINDWATTS_DATA_SHA256=<expected_sha256_checksum> \
+  -t tap-api:latest .
+
+# Or build without checksum verification (not recommended for production)
+docker build \
+  --build-arg WINDWATTS_DATA_URL=https://windwatts-era5.s3.us-west-2.amazonaws.com/ \
+  -t tap-api:latest .
 ```
+
+**Security Note**: Always provide the `WINDWATTS_DATA_SHA256` build argument in production to verify the integrity of the downloaded wheel file. Contact project maintainers to obtain the expected checksum for your version.
 
 ### Run (Production Mode)
 

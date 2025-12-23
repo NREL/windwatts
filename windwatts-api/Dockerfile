@@ -19,12 +19,19 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download and install windwatts_data.whl from s3
+# Download and install windwatts_data.whl from s3 with checksum verification
 ARG WINDWATTS_DATA_URL
 ARG WINDWATTS_DATA_VERSION=1.0.4
 ARG WINDWATTS_DATA_FILE=windwatts_data-${WINDWATTS_DATA_VERSION}-py3-none-any.whl
+ARG WINDWATTS_DATA_SHA256
 ENV WINDWATTS_DATA_URL=${WINDWATTS_DATA_URL}
 RUN curl -o /tmp/windwatts_data-${WINDWATTS_DATA_VERSION}-py3-none-any.whl ${WINDWATTS_DATA_URL}${WINDWATTS_DATA_FILE} && \
+    if [ -n "${WINDWATTS_DATA_SHA256}" ]; then \
+        echo "${WINDWATTS_DATA_SHA256}  /tmp/${WINDWATTS_DATA_FILE}" | sha256sum -c - || \
+        (echo "ERROR: Checksum verification failed for ${WINDWATTS_DATA_FILE}" && exit 1); \
+    else \
+        echo "WARNING: WINDWATTS_DATA_SHA256 not provided. Skipping checksum verification. This is not recommended for production."; \
+    fi && \
     pip install --no-cache-dir /tmp/${WINDWATTS_DATA_FILE} && \
     rm /tmp/${WINDWATTS_DATA_FILE}
 
