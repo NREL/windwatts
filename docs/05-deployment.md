@@ -1,41 +1,103 @@
 # Deployment Guide
 
-## Deploy as a Container
+## Local Development Deployment
 
-This assumes Docker is available on the host.
+Uses Docker Compose to run all services (API, UI, database, reverse proxy).
 
-### Build
+### Prerequisites
 
-```shell
-docker build -t windwatts:latest .
+1. **Docker** and **Docker Compose** installed
+2. **AWS credentials** with access to WindWatts data
+3. **Google Maps API key** and Map ID
+
+### Configuration
+
+**1. Root Environment Variables (`.env`):**
+
+Create a `.env` file in the project root:
+
+```plaintext
+WINDWATTS_DATA_URL=<s3-url-for-windwatts-data-package>
+AWS_ACCESS_KEY_ID=<your-access-key>
+AWS_SECRET_ACCESS_KEY=<your-secret-key>
+AWS_SESSION_TOKEN=<your-session-token>
+WINDWATTS_DATA_CONFIG_SECRETS_ARN=<your-secrets-arn>
 ```
 
-### Run (Production Mode)
+**2. UI Development Environment (`windwatts-ui/.env.development`):**
 
-```shell
-docker run -p 8080:80 -it windwatts:latest uvicorn app.main:app --host 0.0.0.0 --port 80 --workers 4
+```plaintext
+VITE_API_BASE_URL=http://windwatts-proxy:80
+VITE_MAP_API_KEY=<your-map-api-key>
+VITE_MAP_ID=<your-map-id>
 ```
 
-Inside the container, the FastAPI app runs on port `80`. On the host, it's mapped to `8080`.
+**3. Data Configuration (`windwatts-api/app/config/windwatts_data_config.json`):**
 
-### Troubleshooting
+Configure AWS Athena settings and data sources:
 
-To explore the container:
-
-```shell
-docker run -p 8080:80 -it windwatts:latest /bin/bash
+```json
+{
+  "region_name": "us-west-2",
+  "output_location": "s3://your-athena-results-bucket/",
+  "output_bucket": "your-athena-results-bucket",
+  "database": "your-glue-database",
+  "athena_workgroup": "your-athena-workgroup",
+  "sources": {
+    "wtk": {
+      "bucket_name": "your-wtk-bucket",
+      "athena_table_name": "wtk_table",
+      "alt_athena_table_name": "",
+      "capabilities": { "avg_types": ["all", "annual", "monthly", "hourly"] }
+    },
+    "era5": {
+      "bucket_name": "your-era5-bucket",
+      "athena_table_name": "era5_table",
+      "alt_athena_table_name": "",
+      "capabilities": { "avg_types": ["all", "annual"] }
+    }
+  }
+}
 ```
 
-## Production Configuration
+### Deploy
 
-### Database
+Start the application stack:
 
-For production deployment (e.g., AWS):
+```shell
+docker compose up --build
+```
 
-1.  **RDS**: Set up an RDS PostgreSQL instance.
-2.  **Secrets Manager**: Configure `DATABASE_URL` and credentials in AWS Secrets Manager.
-3.  **App Configuration**: Update the service configuration to use the RDS instance instead of a local container.
+- **UI**: Access at `http://localhost:5173`
+- **API**: Access at `http://localhost:8080` (via proxy)
 
-### Environment Variables
+Clean up:
 
-Ensure the production environment has the correct `.env` values (similar to the root `.env` but with production endpoints).
+```shell
+docker compose down --volumes --remove-orphans
+```
+
+## Production Deployment
+
+### Build Individual Services
+
+**API:**
+
+```shell
+cd windwatts-api && docker build -t windwatts-api:latest .
+```
+
+**UI:**
+
+```shell
+cd windwatts-ui && docker build -t windwatts-ui:latest .
+```
+
+### AWS Configuration
+
+- **RDS PostgreSQL**: Configure `DATABASE_URL` for production database
+- **Secrets Manager**: Store `WINDWATTS_DATA_CONFIG_SECRET_ARN` with data source configuration
+- **Environment Variables**: Set production AWS credentials and endpoints
+- **Load Balancer**: Route traffic to containerized services
+
+API runs on port 8000 using Gunicorn with Uvicorn workers.
