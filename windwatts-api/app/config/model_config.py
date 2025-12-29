@@ -65,6 +65,6 @@ MODEL_CONFIG = {
                       "max_lat":51.403, "max_long":-44.224,
                       "spatial_resolution" : "31 km", "temporal_resolution": "1 hour"},
         "links" : [],
-        "references" : ["Manuscript in preparation (publication pending), please contact windwatts@nrel.gov for any questions."]
+        "references" : ["Kevin Menear, Sameer Shaik, Lindsay Sheridan, Dmitry Duplyakin, and Caleb Phillips. Methods for High-Accuracy Wind Resource Assessment to Support Distributed Wind Turbine Siting. Under Review."]
     }
 }
