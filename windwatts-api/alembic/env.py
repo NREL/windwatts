@@ -3,6 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import app.database.models
 from app.database.connection import Base
 
 from logging.config import fileConfig
