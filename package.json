@@ -2,12 +2,14 @@
   "private": true,
   "workspaces": [
     "windwatts-ui",
-    "windwatts-api"
+    "windwatts-api",
+    "windwatts-ssr"
   ],
   "scripts": {
     "prepare": "husky",
     "lint": "eslint",
-    "format": "prettier"
+    "format": "prettier",
+    "dev:ssr": "docker compose up --build windwatts-ssr"
   },
   "lint-staged": {
     "windwatts-ui/src/**/*.{js,jsx,ts,tsx}": [

@@ -35,3 +35,4 @@ windwatts-api/env-vars.sh
 node_modules/
 update-env-credentials.sh
 manage-aws-parameters.sh
+.next/

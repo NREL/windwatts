@@ -32,6 +32,8 @@ export default tseslint.config(
       ],
       // Enforce named exports for consistency and maintainability
       "import/no-default-export": "error",
+      // Disallow spaces inside single-line blocks: () => {} not () => { }
+      "block-spacing": ["error", "never"],
     },
   },
   {

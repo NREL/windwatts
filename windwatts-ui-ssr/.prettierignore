@@ -1,0 +1,12 @@
+.next/
+node_modules/
+dist/
+dist-ssr/
+*.local
+*.log
+*.log.*
+*.log.*.*
+*.log.*.*.*
+*.log.*.*.*.*
+*.log.*.*.*.*.*
+*.log.*.*.*.*.*.*
