@@ -33,7 +33,7 @@ export function OutOfBoundsWarning({ message }: { message: string }) {
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, fontSize: 12 }}>
           <Link
-            href="https://github.com/NREL/dw-tap-api/blob/master/about/era5.md#spatial-coverage"
+            href="https://github.com/NREL/windwatts/blob/main/docs/about/era5.md#spatial-coverage"
             target="_blank"
             rel="noopener noreferrer"
             underline="hover"

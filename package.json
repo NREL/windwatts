@@ -12,6 +12,9 @@
   "lint-staged": {
     "windwatts-ui/src/**/*.{js,jsx,ts,tsx}": [
       "./check-format.sh"
+    ],
+    "windwatts-api/**/*.py": [
+      "./check-api-format.sh"
     ]
   },
   "devDependencies": {

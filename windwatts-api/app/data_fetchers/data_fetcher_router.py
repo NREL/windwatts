@@ -1,6 +1,7 @@
 import json
 from .abstract_data_fetcher import AbstractDataFetcher
 
+
 class DataFetcherRouter:
     def __init__(self):
         """
@@ -18,7 +19,7 @@ class DataFetcherRouter:
         """
         self.fetchers[key] = fetcher
 
-    def fetch_data(self, params: dict , key: str = "athena_wtk"):
+    def fetch_data(self, params: dict, key: str = "athena_wtk"):
         """
         Fetch aggregated data using specified data fetcher.
 
@@ -38,7 +39,7 @@ class DataFetcherRouter:
             return fetcher.fetch_data(**params)
         else:
             raise ValueError(f"No fetcher found for key={key}")
-    
+
     def fetch_raw(self, params: dict, key: str = "athena_wtk"):
         """
         Fetch raw, unaggregated data (DataFrame) using specified data fetcher.
@@ -58,6 +59,7 @@ class DataFetcherRouter:
             return fetcher.fetch_raw(**params)
         else:
             raise ValueError(f"No fetcher found for key={key}")
+
     def fetch_data_routing(self, params: dict, source: str = "athena_wtk"):
         """
         Fetch data using the appropriate data fetcher through routing logics.

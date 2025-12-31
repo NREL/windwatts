@@ -1,4 +1,8 @@
-# Welcome to the WindWatts API project
+# WindWatts API (Backend)
+
+This directory contains the Python backend for WindWatts, built with FastAPI.
+
+For development instructions, setup guides, and architecture details, please see the **[Backend Documentation](../docs/03-backend.md)**.
 
 This project is set up like a standard Python project. The initialization
 process also creates a virtualenv within this project, stored under the `.venv`

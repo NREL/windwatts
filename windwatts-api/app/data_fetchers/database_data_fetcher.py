@@ -1,13 +1,14 @@
-from typing import List
 import json
 from .abstract_data_fetcher import WTKDataFetcher
 from app.utils.data_fetcher_utils import generate_key
+
 
 class DatabaseDataFetcher(WTKDataFetcher):
     """
     Class for fetching data from the database.
     TODO: Refactor this to handle pre-computed/aggregated results in the future instead of caching.
     """
+
     def __init__(self, db_manager):
         """
         Initializes the DatabaseDataFetcher with the given DatabaseManager.

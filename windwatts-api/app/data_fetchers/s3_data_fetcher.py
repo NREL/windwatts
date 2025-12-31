@@ -9,9 +9,10 @@ from .abstract_data_fetcher import AbstractDataFetcher
 MIN_POOL_WORKERS = 1
 
 s3_key_templates = {
-    "era5" : "{prefix}/year={year}/index={index}/{year}_{index}.csv.gz",
-    "wtk" : "{prefix}/year={year}/varset=all/index={index}/{index}_{year}_all.csv.gz"
+    "era5": "{prefix}/year={year}/index={index}/{year}_{index}.csv.gz",
+    "wtk": "{prefix}/year={year}/varset=all/index={index}/{index}_{year}_all.csv.gz",
 }
+
 
 class S3DataFetcher(AbstractDataFetcher):
     def __init__(self, bucket_name: str, prefix: str, s3_key_template: str, grid: str):
@@ -23,7 +24,9 @@ class S3DataFetcher(AbstractDataFetcher):
             s3_key_template(str): The s3 key template to download files.
             grid (str): The grid of the data. "era5" or "wtk"
         """
-        print(f"Initializing S3 Data Fetcher: bucket: {bucket_name} prefix: {prefix} grid: {grid} ...")
+        print(
+            f"Initializing S3 Data Fetcher: bucket: {bucket_name} prefix: {prefix} grid: {grid} ..."
+        )
         self.s3_client = boto3.client(
             "s3",
             config=Config(
@@ -35,9 +38,11 @@ class S3DataFetcher(AbstractDataFetcher):
         self.prefix = prefix
         self.grid = grid
         if s3_key_template not in s3_key_templates:
-            raise ValueError(f"Unknown s3_key_template '{s3_key_template}', expected one of {list(s3_key_templates)}")
+            raise ValueError(
+                f"Unknown s3_key_template '{s3_key_template}', expected one of {list(s3_key_templates)}"
+            )
         self.s3_key_template = s3_key_templates[s3_key_template]
-    
+
     def generate_s3_keys(self, grid_Indices: List[str], years: List[int]) -> List[str]:
         """
         Build S3 object keys for the given years and nearest grid indices.
@@ -51,11 +56,13 @@ class S3DataFetcher(AbstractDataFetcher):
         for year in years:
             for index in grid_Indices:
                 # uri specific to era5 timeseries, might change for ensemble timeseries as it might not have year.
-                key = self.s3_key_template.format(prefix=self.prefix, year=year, index=index)
+                key = self.s3_key_template.format(
+                    prefix=self.prefix, year=year, index=index
+                )
                 keys.append(key)
-        
+
         return keys
-    
+
     def fetch_raw(self, key: str, cols: Optional[List[str]]):
         """
         Download + parse a single gzip CSV from S3.
