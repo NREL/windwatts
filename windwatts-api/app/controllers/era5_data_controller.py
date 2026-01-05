@@ -224,8 +224,10 @@ def get_windspeed_with_avg_type(
             )
         else:
             return _get_windspeed_core(lat, lng, height, avg_type, source)
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -257,8 +259,10 @@ def get_windspeed(
             )
         else:
             return _get_windspeed_core(lat, lng, height, period, source)
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -296,8 +300,10 @@ def fetch_available_powercurves():
 
         ordered_curves = curves_sorted + other_curves_sorted
         return {"available_power_curves": ordered_curves}
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 def _get_energy_production_core(
@@ -442,8 +448,10 @@ def energy_production(
             return _get_energy_production_core(
                 lat, lng, height, powercurve, period, source
             )
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 def _download_csv_core(gridIndices: List[str], years: List[int], source: str):
@@ -488,8 +496,8 @@ def download_timeseries_csv(
             iter([csv_io.getvalue()]), media_type="text/csv; charset=utf-8"
         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post(
@@ -528,8 +536,8 @@ def download_timeseries_csv_batch(
             chunker(spooled), media_type="application/zip", headers=headers
         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(

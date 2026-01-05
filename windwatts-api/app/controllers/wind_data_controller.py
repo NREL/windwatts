@@ -121,6 +121,9 @@ def get_windspeed(
     - **source**: Optional data source override
     """
     try:
+        # Catch invalid model before core function call
+        model = validate_model(model)
+
         # Use default source if not provided
         if source is None:
             source = MODEL_CONFIG.get(model, {}).get("default_source", "athena")
@@ -130,8 +133,8 @@ def get_windspeed(
         )
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -177,6 +180,9 @@ def get_production(
     - **source**: Optional data source override
     """
     try:
+        # Catch invalid model before core function call
+        model = validate_model(model)
+
         # Use default source if not provided
         if source is None:
             source = MODEL_CONFIG.get(model, {}).get("default_source", "athena")
@@ -186,8 +192,8 @@ def get_production(
         )
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -226,8 +232,8 @@ def get_powercurves():
 
         ordered_curves = nrel_curves_sorted + other_curves_sorted
         return {"available_power_curves": ordered_curves}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -285,8 +291,8 @@ def get_grid_points(
         return {"locations": locations}
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -331,8 +337,8 @@ def get_model_info(
         }
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -382,8 +388,8 @@ def download_timeseries(
 
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post(
@@ -440,5 +446,5 @@ def download_timeseries_batch(
 
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")

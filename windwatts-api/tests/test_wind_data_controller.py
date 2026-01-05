@@ -27,7 +27,9 @@ def test_get_wtk_data_failure():
 
 
 def test_get_wtk_data_success():
-    response = client.get("/wtk/windspeed?lat=40.0&lng=-70.0&height=10&source=athena")
+    response = client.get(
+        "/wtk/windspeed?lat=40.0&lng=-70.0&height=10&source=athena_wtk"
+    )
     assert response.status_code == 200
     json = response.json()
     assert "global_avg" in json

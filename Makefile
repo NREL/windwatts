@@ -10,5 +10,5 @@ format:
 
 test:
 	$(MAKE) -C windwatts-api test
-	cd windwatts-ui && yarn test
+	cd windwatts-ui && yarn test -- --run
 

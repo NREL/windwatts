@@ -39,25 +39,25 @@ if not _skip_data_init:
     )  # replace with YOUR local config path
     athena_config = config_manager.get_config()
 
-# Initialize DataFetchers
-s3_data_fetcher_wtk = S3DataFetcher(
-    bucket_name="wtk-led", prefix="1224", grid="wtk", s3_key_template="wtk"
-)
-athena_data_fetcher_wtk = AthenaDataFetcher(
-    athena_config=athena_config, source_key="wtk"
-)
-# db_manager = DatabaseManager()
-# db_data_fetcher = DatabaseDataFetcher(db_manager=db_manager)
+    # Initialize DataFetchers
+    s3_data_fetcher_wtk = S3DataFetcher(
+        bucket_name="wtk-led", prefix="1224", grid="wtk", s3_key_template="wtk"
+    )
+    athena_data_fetcher_wtk = AthenaDataFetcher(
+        athena_config=athena_config, source_key="wtk"
+    )
+    # db_manager = DatabaseManager()
+    # db_data_fetcher = DatabaseDataFetcher(db_manager=db_manager)
 
-# Register fetchers
-# data_fetcher_router.register_fetcher("database", db_data_fetcher)
-data_fetcher_router.register_fetcher("s3_wtk", s3_data_fetcher_wtk)
-data_fetcher_router.register_fetcher("athena_wtk", athena_data_fetcher_wtk)
+    # Register fetchers
+    # data_fetcher_router.register_fetcher("database", db_data_fetcher)
+    data_fetcher_router.register_fetcher("s3_wtk", s3_data_fetcher_wtk)
+    data_fetcher_router.register_fetcher("athena_wtk", athena_data_fetcher_wtk)
 
 VALID_AVG_TYPES = {
     "athena_wtk": {
-        "wind_speed": ["global", "yearly", "monthly", "hourly", "none"],
-        "production": ["global", "summary", "yearly", "monthly", "all", "none"],
+        "wind_speed": ["all", "yearly", "monthly", "hourly", "none"],
+        "production": ["all", "summary", "yearly", "monthly", "none"],
     }
 }
 
@@ -197,8 +197,10 @@ def get_windspeed_with_avg_type(
 ):
     try:
         return _get_windspeed_core(lat, lng, height, avg_type, source)
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -220,9 +222,11 @@ def get_windspeed(
     source: str = Query(DEFAULT_SOURCE, description="Source of the data."),
 ):
     try:
-        return _get_windspeed_core(lat, lng, height, "global", source)
+        return _get_windspeed_core(lat, lng, height, "all", source)
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -256,8 +260,10 @@ def fetch_available_powercurves():
         other_curves_sorted = sorted(other_curves)
         ordered_curves = curves_sorted + other_curves_sorted
         return {"available_power_curves": ordered_curves}
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 def _get_energy_production_core(
@@ -363,8 +369,10 @@ def energy_production_with_period(
         return _get_energy_production_core(
             lat, lng, height, selected_powercurve, time_period, source
         )
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -390,8 +398,10 @@ def energy_production(
         return _get_energy_production_core(
             lat, lng, height, selected_powercurve, "all", source
         )
+    except HTTPException:
+        raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 def _download_csv_core(gridIndices: List[str], years: List[int], source: str):
@@ -436,8 +446,8 @@ def download_csv(
             iter([csv_io.getvalue()]), media_type="text/csv; charset=utf-8"
         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post(
@@ -476,8 +486,8 @@ def download_csv_batch(
             chunker(spooled), media_type="application/zip", headers=headers
         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(

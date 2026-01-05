@@ -36,10 +36,11 @@ class TestV1WindspeedEndpoints:
         assert response.status_code == 200
         json = response.json()
         assert isinstance(json, dict)
-        # Should have year keys
-        if json:
-            first_key = list(json.keys())[0]
-            assert first_key.isdigit() or first_key == "2013"  # Year format
+        # Should have yearly_avg key with array of year data
+        assert "yearly_avg" in json
+        assert isinstance(json["yearly_avg"], list)
+        if json["yearly_avg"]:
+            assert "year" in json["yearly_avg"][0]
 
     def test_wtk_windspeed_default(self):
         """Test WTK windspeed with default period."""
@@ -61,6 +62,9 @@ class TestV1WindspeedEndpoints:
             "/api/v1/invalid_model/windspeed?lat=40.0&lng=-70.0&height=40"
         )
         assert response.status_code == 400
+        json = response.json()
+        assert "detail" in json
+        assert "Invalid model" in json["detail"]
 
     def test_windspeed_invalid_period(self):
         """Test windspeed with invalid period."""
@@ -90,7 +94,7 @@ class TestV1ProductionEndpoints:
         )
         assert response.status_code == 200
         json = response.json()
-        assert "energy_production" in json
+        assert "summary_avg_energy_production" in json
 
     def test_era5_production_annual(self):
         """Test ERA5 production with period=annual."""
@@ -224,8 +228,8 @@ class TestV1Info:
         json = response.json()
         assert "model" in json
         assert json["model"] == "era5"
-        assert "sources" in json
-        assert "heights" in json
+        assert "supported_periods" in json
+        assert "available_heights" in json
 
     def test_wtk_info(self):
         """Test WTK info endpoint."""
