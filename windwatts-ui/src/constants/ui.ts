@@ -36,7 +36,10 @@ export const GEOLOCATION_OPTIONS = {
 };
 
 export const OUT_OF_BOUNDS_MARKER_CONFIG = {
-  path: typeof window !== "undefined" ? window.google?.maps?.SymbolPath?.CIRCLE : undefined,
+  path:
+    typeof window !== "undefined"
+      ? window.google?.maps?.SymbolPath?.CIRCLE
+      : undefined,
   scale: 10,
   fillColor: "#d32f2f",
   fillOpacity: 1,
