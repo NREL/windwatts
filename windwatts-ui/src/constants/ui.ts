@@ -35,17 +35,17 @@ export const GEOLOCATION_OPTIONS = {
   enableHighAccuracy: true,
 };
 
-export const OUT_OF_BOUNDS_MARKER_CONFIG = {
-  path:
-    typeof window !== "undefined"
-      ? window.google?.maps?.SymbolPath?.CIRCLE
-      : undefined,
-  scale: 10,
-  fillColor: "#d32f2f",
-  fillOpacity: 1,
-  strokeWeight: 2,
-  strokeColor: "#fff",
-};
+export const OUT_OF_BOUNDS_MARKER_CONFIG: google.maps.Symbol | undefined =
+  typeof window !== "undefined" && window.google?.maps
+    ? {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "#d32f2f",
+        fillOpacity: 1,
+        strokeWeight: 2,
+        strokeColor: "#fff",
+      }
+    : undefined;
 
 export const SNACKBAR_DURATION_SUCCESS = 3000;
 export const SNACKBAR_DURATION_ERROR = 4000;

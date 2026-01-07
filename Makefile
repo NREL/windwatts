@@ -1,4 +1,4 @@
-.PHONY: all lint format test
+.PHONY: all lint format test build-ui verify
 
 lint:
 	$(MAKE) -C windwatts-api lint
@@ -11,4 +11,9 @@ format:
 test:
 	$(MAKE) -C windwatts-api test
 	cd windwatts-ui && yarn test -- --run
+
+build-ui:
+	cd windwatts-ui && yarn build
+
+verify: lint test build-ui
 
