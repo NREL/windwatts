@@ -1,6 +1,6 @@
 import { GoogleMap } from "@react-google-maps/api";
-import { useContext } from "react";
-import { SearchBar } from "../core";
+import { useContext, useRef } from "react";
+import { SearchBar, SearchBarRef } from "../core";
 import { Box } from "@mui/material";
 import { SettingsContext } from "../../providers/SettingsContext";
 import { OutOfBoundsMarker, LoadingBackdrop } from "../shared";
@@ -18,6 +18,7 @@ export const MapViewDesktop = () => {
     preferredModel,
   } = useOutOfBounds();
   const { isLoaded, onLoad } = useMapView(currentPosition, zoom, setZoom);
+  const searchBarRef = useRef<SearchBarRef>(null);
 
   useGeolocation();
 
@@ -45,6 +46,9 @@ export const MapViewDesktop = () => {
       lat,
       lng,
     });
+
+    // Clear search bar
+    searchBarRef.current?.clearInput();
   };
 
   if (!isLoaded) {
@@ -78,6 +82,7 @@ export const MapViewDesktop = () => {
           }}
         >
           <SearchBar
+            ref={searchBarRef}
             useGoogleAutocomplete={true}
             onPlaceSelected={handlePlaceSelected}
             onSettingsClick={toggleSettings}
