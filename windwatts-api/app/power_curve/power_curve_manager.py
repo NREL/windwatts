@@ -10,7 +10,7 @@ from typing import Optional, List, Union
 
 class DatasetSchema(Enum):
     HOURLY_TIMESERIES = "timeseries"  # full time-series data (year/month/hour/day based, magnitudes not quantiles) - era5 timeseries
-    TIMESERIES_1224 = "timeseries_1224" # WTK 12*24 timeseries
+    TIMESERIES_1224 = "timeseries_1224"  # WTK 12*24 timeseries
     QUANTILES_WITH_YEAR = "quantiles_with_year"  # Quantile distributions, separated by year - era5 quantiles
     QUANTILES_GLOBAL = "quantiles_global"  # Quantile distribution without year (global) - ensemble data
 
@@ -91,16 +91,16 @@ class PowerCurveManager:
 
         if has_prob:
             if has_year:
-                return DatasetSchema.QUANTILES_WITH_YEAR # era5 quantiles
+                return DatasetSchema.QUANTILES_WITH_YEAR  # era5 quantiles
             else:
-                return DatasetSchema.QUANTILES_GLOBAL # ensemble
-        
+                return DatasetSchema.QUANTILES_GLOBAL  # ensemble
+
         elif has_time:
-            return DatasetSchema.HOURLY_TIMESERIES # era5 timeseries
-        
+            return DatasetSchema.HOURLY_TIMESERIES  # era5 timeseries
+
         elif has_mohr:
-            return DatasetSchema.TIMESERIES_1224 # wtk 12*24 timeseries
-        
+            return DatasetSchema.TIMESERIES_1224  # wtk 12*24 timeseries
+
         # Fall back: if neither, assume WTK-like (time-series) but raise if critical cols are missing later
         return DatasetSchema.TIMESERIES_1224
 
@@ -321,7 +321,7 @@ class PowerCurveManager:
                 work["hour"] = time.dt.hour.astype(int)
             if not has_day:
                 work["day"] = time.dt.day.astype(int)
-    
+
             work["time"] = time
 
             return work
@@ -334,20 +334,24 @@ class PowerCurveManager:
             if not has_hour:
                 work["hour"] = (mohr % 100).astype(int)
             if not has_year:
-                raise ValueError("Cannot extract 'year' from 'mohr' column." \
-                "Year must be present from the data returned from Athena source or" \
-                "provided through another time column.")
+                raise ValueError(
+                    "Cannot extract 'year' from 'mohr' column."
+                    "Year must be present from the data returned from Athena source or"
+                    "provided through another time column."
+                )
             return work
-        
+
         else:
-            raise ValueError("No recognized time column found. "\
-            "Dataset must contain either 'time' (datetime) or 'mohr' (month-hour encoding) column "\
-            "for timeseries normalization.")
+            raise ValueError(
+                "No recognized time column found. "
+                "Dataset must contain either 'time' (datetime) or 'mohr' (month-hour encoding) column "
+                "for timeseries normalization."
+            )
 
     def compute_energy_production_df(
         self,
         df: pd.DataFrame,
-        heights: Union[int,List[int]],
+        heights: Union[int, List[int]],
         selected_power_curve: str,
         relevant_columns_only: bool = True,
     ) -> pd.DataFrame:
@@ -371,20 +375,25 @@ class PowerCurveManager:
 
         if isinstance(heights, int):
             heights = [heights]
-        
+
         if not heights:
-            raise ValueError("heights parameter cannot be empty. Provide at least one height value.")
+            raise ValueError(
+                "heights parameter cannot be empty. Provide at least one height value."
+            )
 
         ws_cols = [f"windspeed_{height}m" for height in heights]
 
         for ws_col in ws_cols:
             if ws_col not in df.columns:
                 raise KeyError(f"Expected column '{ws_col}' in input dataframe.")
-        
+
         schema = self._classify_schema(df)
         power_curve = self.get_curve(selected_power_curve)
 
-        if schema == DatasetSchema.HOURLY_TIMESERIES or schema == DatasetSchema.TIMESERIES_1224:
+        if (
+            schema == DatasetSchema.HOURLY_TIMESERIES
+            or schema == DatasetSchema.TIMESERIES_1224
+        ):
             normalized_df = self._normalize_timeseries_time_fields(df)
             work = normalized_df.copy()
             for ws_col in ws_cols:
@@ -397,7 +406,7 @@ class PowerCurveManager:
                         cols.append(temporal_col)
                 cols += ws_cols + [f"{ws_col}_kw" for ws_col in ws_cols]
                 return work[cols], schema
-            
+
             return work, schema
 
         elif schema == DatasetSchema.QUANTILES_WITH_YEAR:
@@ -444,7 +453,7 @@ class PowerCurveManager:
                     use_swi=use_swi_eff,
                 )
                 col_dfs.append(mid_df)
-            
+
             out = pd.concat(col_dfs, axis=1) if col_dfs else pd.DataFrame()
 
             if not relevant_columns_only:
@@ -472,7 +481,9 @@ class PowerCurveManager:
             For global quantiles (no year), returns a single pseudo-row with year=None.
             pd.Dataframe
         """
-        prod_df, schema = self.compute_energy_production_df(df, height, selected_power_curve)
+        prod_df, schema = self.compute_energy_production_df(
+            df, height, selected_power_curve
+        )
         ws_column = f"windspeed_{height}m"
         kw_column = f"windspeed_{height}m_kw"
 
@@ -651,9 +662,14 @@ class PowerCurveManager:
         'Feb': {'Average wind speed, m/s': '3.92', 'kWh produced': '6,357'},
         'Mar': {'Average wind speed, m/s': '4.17', 'kWh produced': '7,689'}....}
         """
-        prod_df, schema = self.compute_energy_production_df(df, height, selected_power_curve)
-        
-        if schema not in [DatasetSchema.HOURLY_TIMESERIES, DatasetSchema.TIMESERIES_1224]:
+        prod_df, schema = self.compute_energy_production_df(
+            df, height, selected_power_curve
+        )
+
+        if schema not in [
+            DatasetSchema.HOURLY_TIMESERIES,
+            DatasetSchema.TIMESERIES_1224,
+        ]:
             raise ValueError(
                 "Monthly averages are only supported for time-series (TIMESERIES) inputs."
             )
@@ -677,7 +693,7 @@ class PowerCurveManager:
 
         if schema == DatasetSchema.TIMESERIES_1224:
             # WTK 1224: sum = 1 day -> scale by 30 and averaging across years
-            res["kwh_total"] *= (30 / n_years)
+            res["kwh_total"] *= 30 / n_years
         else:  # HOURLY_TIMESERIES
             # ERA5: sum = full month for all years -> and averaging across years
             res["kwh_total"] /= n_years
