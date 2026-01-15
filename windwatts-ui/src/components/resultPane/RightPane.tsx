@@ -46,7 +46,7 @@ export const RightPane = () => {
       data: hubHeight ? `${hubHeight} meters` : "Not selected",
     },
     {
-      title: "Power curve",
+      title: "Turbine",
       data: powerCurve ? `${POWER_CURVE_LABEL[powerCurve]}` : "Not selected",
     },
   ];
