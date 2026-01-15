@@ -9,7 +9,8 @@ from typing import Optional, List, Union
 
 
 class DatasetSchema(Enum):
-    TIMESERIES = "timeseries"  # Any raw time-series data (year/month/hour based, magnitudes not quantiles) - wtk, era5 timeseries
+    HOURLY_TIMESERIES = "timeseries"  # full time-series data (year/month/hour/day based, magnitudes not quantiles) - era5 timeseries
+    TIMESERIES_1224 = "timeseries_1224" # WTK 12*24 timeseries
     QUANTILES_WITH_YEAR = "quantiles_with_year"  # Quantile distributions, separated by year - era5 quantiles
     QUANTILES_GLOBAL = "quantiles_global"  # Quantile distribution without year (global) - ensemble data
 
@@ -37,7 +38,8 @@ class PowerCurveManager:
         self.use_swi_default = use_swi_default
 
         self.schema_swi_prefs = {
-            DatasetSchema.TIMESERIES: False,  # not used for midpoints; defined for completeness
+            DatasetSchema.HOURLY_TIMESERIES: False,  # not used for midpoints; defined for completeness
+            DatasetSchema.TIMESERIES_1224: False,
             DatasetSchema.QUANTILES_WITH_YEAR: True,  # SWI ON
             DatasetSchema.QUANTILES_GLOBAL: False,  # SWI OFF
         }
@@ -81,22 +83,26 @@ class PowerCurveManager:
         :rtype: DatasetSchema
         """
         cols = set(df.columns.str.lower())  # robust to case
+
         has_prob = "probability" in cols
-        has_year = "year" in cols
         has_mohr = "mohr" in cols
-        has_month_hour = "month" in cols and "hour" in cols
         has_time = "time" in cols  ## to support ERA5 timeseries
+        has_year = "year" in cols
 
         if has_prob:
             if has_year:
-                return DatasetSchema.QUANTILES_WITH_YEAR
+                return DatasetSchema.QUANTILES_WITH_YEAR # era5 quantiles
             else:
-                return DatasetSchema.QUANTILES_GLOBAL
-        # No probability column → treat as WTK-like time series
-        if has_mohr or has_month_hour or has_time:
-            return DatasetSchema.TIMESERIES
+                return DatasetSchema.QUANTILES_GLOBAL # ensemble
+        
+        elif has_time:
+            return DatasetSchema.HOURLY_TIMESERIES # era5 timeseries
+        
+        elif has_mohr:
+            return DatasetSchema.TIMESERIES_1224 # wtk 12*24 timeseries
+        
         # Fall back: if neither, assume WTK-like (time-series) but raise if critical cols are missing later
-        return DatasetSchema.TIMESERIES
+        return DatasetSchema.TIMESERIES_1224
 
     def load_power_curves(self, directory: str):
         """
@@ -299,6 +305,7 @@ class PowerCurveManager:
         has_year = "year" in work.columns
         has_month = "month" in work.columns
         has_hour = "hour" in work.columns
+        has_day = "day" in work.columns
 
         if has_year and has_month and has_hour:
             return work
@@ -312,9 +319,7 @@ class PowerCurveManager:
                 work["month"] = time.dt.month.astype(int)
             if not has_hour:
                 work["hour"] = time.dt.hour.astype(int)
-            
-            # Optionally checking for day
-            if "day" not in work.columns:
+            if not has_day:
                 work["day"] = time.dt.day.astype(int)
     
             work["time"] = time
@@ -375,14 +380,13 @@ class PowerCurveManager:
         for ws_col in ws_cols:
             if ws_col not in df.columns:
                 raise KeyError(f"Expected column '{ws_col}' in input dataframe.")
-
+        
         schema = self._classify_schema(df)
         power_curve = self.get_curve(selected_power_curve)
 
-        if schema == DatasetSchema.TIMESERIES:
-            work = df.copy()
-            work = self._normalize_timeseries_time_fields(work)
-
+        if schema == DatasetSchema.HOURLY_TIMESERIES or schema == DatasetSchema.TIMESERIES_1224:
+            normalized_df = self._normalize_timeseries_time_fields(df)
+            work = normalized_df.copy()
             for ws_col in ws_cols:
                 work[f"{ws_col}_kw"] = power_curve.windspeed_to_kw(work, ws_col)
 
@@ -392,9 +396,9 @@ class PowerCurveManager:
                     if temporal_col in work.columns:
                         cols.append(temporal_col)
                 cols += ws_cols + [f"{ws_col}_kw" for ws_col in ws_cols]
-                return work[cols]
+                return work[cols], schema
             
-            return work
+            return work, schema
 
         elif schema == DatasetSchema.QUANTILES_WITH_YEAR:
             use_swi_eff = self._use_swi_for(schema)
@@ -404,7 +408,6 @@ class PowerCurveManager:
                 group = group.sort_values("probability").reset_index(drop=True)
                 col_dfs = []
 
-                # Process remaining ws_cols
                 for ws_col in ws_cols:
                     mid_df = self._quantiles_to_kw_midpoints(
                         group[["probability", ws_col]].copy(),
@@ -420,13 +423,13 @@ class PowerCurveManager:
             out = pd.concat(records, ignore_index=True) if records else pd.DataFrame()
 
             if not relevant_columns_only:
-                return out
+                return out, schema
 
             cols = ["year"]
             for h in heights:
                 ws_col = f"windspeed_{h}m"
                 cols += [ws_col, f"{ws_col}_kw"]
-            return out[cols]
+            return out[cols], schema
 
         else:  # DatasetSchema.QUANTILES_GLOBAL
             use_swi_eff = self._use_swi_for(schema)
@@ -445,13 +448,13 @@ class PowerCurveManager:
             out = pd.concat(col_dfs, axis=1) if col_dfs else pd.DataFrame()
 
             if not relevant_columns_only:
-                return out
+                return out, schema
 
             cols = []
             for h in heights:
                 ws_col = f"windspeed_{h}m"
                 cols += [ws_col, f"{ws_col}_kw"]
-            return out[cols]
+            return out[cols], schema
 
     def prepare_yearly_production_df(
         self, df: pd.DataFrame, height: int, selected_power_curve: str
@@ -469,14 +472,12 @@ class PowerCurveManager:
             For global quantiles (no year), returns a single pseudo-row with year=None.
             pd.Dataframe
         """
-        prod_df = self.compute_energy_production_df(df, height, selected_power_curve)
+        prod_df, schema = self.compute_energy_production_df(df, height, selected_power_curve)
         ws_column = f"windspeed_{height}m"
         kw_column = f"windspeed_{height}m_kw"
 
-        schema = self._classify_schema(df)
-
         res_list = []
-        if schema == DatasetSchema.TIMESERIES:
+        if schema == DatasetSchema.TIMESERIES_1224:
             work = prod_df.copy()
             # If wind direction columns slipped through, drop them
             work = work.drop(
@@ -486,9 +487,25 @@ class PowerCurveManager:
 
             for year, group in work.groupby("year"):
                 avg_ws = group[ws_column].mean()
-                # Original approximation used in your code:
                 # sum of instantaneous power over typical month × 30 days
                 kwh = group[kw_column].sum() * 30
+                res_list.append(
+                    {
+                        "year": year,
+                        "Average wind speed (m/s)": avg_ws,
+                        "kWh produced": kwh,
+                    }
+                )
+        elif schema == DatasetSchema.HOURLY_TIMESERIES:
+            work = prod_df.copy()
+            work = work.drop(
+                columns=[c for c in work.columns if "winddirection" in c],
+                errors="ignore",
+            )
+
+            for year, group in work.groupby("year"):
+                avg_ws = group[ws_column].mean()
+                kwh = group[kw_column].sum()
                 res_list.append(
                     {
                         "year": year,
@@ -634,12 +651,12 @@ class PowerCurveManager:
         'Feb': {'Average wind speed, m/s': '3.92', 'kWh produced': '6,357'},
         'Mar': {'Average wind speed, m/s': '4.17', 'kWh produced': '7,689'}....}
         """
-        schema = self._classify_schema(df)
-        if schema != DatasetSchema.TIMESERIES:
+        prod_df, schema = self.compute_energy_production_df(df, height, selected_power_curve)
+        
+        if schema not in [DatasetSchema.HOURLY_TIMESERIES, DatasetSchema.TIMESERIES_1224]:
             raise ValueError(
                 "Monthly averages are only supported for time-series (TIMESERIES) inputs."
             )
-        prod_df = self.compute_energy_production_df(df, height, selected_power_curve)
 
         ws_column = f"windspeed_{height}m"
         kw_column = f"windspeed_{height}m_kw"
@@ -647,7 +664,7 @@ class PowerCurveManager:
         work = prod_df.drop(
             columns=[col for col in prod_df.columns if "winddirection" in col],
             errors="ignore",
-        )
+        ).copy()
 
         res = work.groupby("month").agg(
             avg_ws=(ws_column, "mean"), kwh_total=(kw_column, "sum")
@@ -658,9 +675,12 @@ class PowerCurveManager:
         if n_years == 0:
             raise ValueError("No valid years found in timeseries data.")
 
-        res["kwh_total"] *= (
-            30 / n_years
-        )  # Approximation: 30 days per month, averaged over n_years years
+        if schema == DatasetSchema.TIMESERIES_1224:
+            # WTK 1224: sum = 1 day -> scale by 30 and averaging across years
+            res["kwh_total"] *= (30 / n_years)
+        else:  # HOURLY_TIMESERIES
+            # ERA5: sum = full month for all years -> and averaging across years
+            res["kwh_total"] /= n_years
 
         res.rename(
             columns={"avg_ws": "Average wind speed (m/s)", "kwh_total": "kWh produced"},
