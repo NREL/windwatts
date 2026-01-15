@@ -148,6 +148,7 @@ class FullEnergyProductionResponse(BaseModel):
     energy_production: Numeric = Field(description="global-averaged kWh produced")
     summary_avg_energy_production: Dict[str, ValueMapAlphaNumericNone]
     yearly_avg_energy_production: Dict[str, ValueMapAlphaNumeric]
+    monthly_avg_energy_production: Dict[str, ValueMapAlphaNumeric]
 
     model_config = {
         "json_schema_extra": {
@@ -173,6 +174,9 @@ class FullEnergyProductionResponse(BaseModel):
                 "yearly_avg_energy_production": {
                     "2001": {"Average wind speed (m/s)": "5.65", "kWh produced": 250117}
                 },
+                "monthly_avg_energy_production": {
+                    "Jan": {"Average wind speed, m/s": "3.80", "kWh produced": 46141}
+                }
             }
         }
     }
@@ -185,8 +189,8 @@ class MonthlyEnergyProductionResponse(BaseModel):
         "json_schema_extra": {
             "example": {
                 "monthly_avg_energy_production": {
-                    "Jan": {"Average wind speed, m/s": "3.80", "kWh produced": "5,934"},
-                    "Feb": {"Average wind speed, m/s": "3.92", "kWh produced": "6,357"},
+                    "Jan": {"Average wind speed, m/s": "3.80", "kWh produced": 46141},
+                    "Feb": {"Average wind speed, m/s": "3.92", "kWh produced": 38757},
                 }
             }
         }

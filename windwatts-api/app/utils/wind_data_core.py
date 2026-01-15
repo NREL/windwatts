@@ -151,12 +151,18 @@ def get_production_core(
                 df, height, powercurve
             )
         )
+        monthly_avg_energy_production = (
+            power_curve_manager.calculate_monthly_energy_production(
+                df, height, powercurve
+            )
+        )
         return {
             "energy_production": summary_avg_energy_production["Average year"][
                 "kWh produced"
             ],
             "summary_avg_energy_production": summary_avg_energy_production,
             "yearly_avg_energy_production": yearly_avg_energy_production,
+            "monthly_avg_energy_production": monthly_avg_energy_production
         }
 
 

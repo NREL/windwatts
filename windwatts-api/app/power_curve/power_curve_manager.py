@@ -5,14 +5,12 @@ import calendar
 import numpy as np
 from scipy.interpolate import CubicSpline
 from enum import Enum
-from typing import Optional
+from typing import Optional, List, Union
 
 
 class DatasetSchema(Enum):
-    TIMESERIES = "timeseries"  # Any raw time-series data (year/month/hour based, magnitudes not quantiles) - wtk
-    QUANTILES_WITH_YEAR = (
-        "quantiles_with_year"  # Quantile distributions, separated by year - era5
-    )
+    TIMESERIES = "timeseries"  # Any raw time-series data (year/month/hour based, magnitudes not quantiles) - wtk, era5 timeseries
+    QUANTILES_WITH_YEAR = "quantiles_with_year"  # Quantile distributions, separated by year - era5 quantiles
     QUANTILES_GLOBAL = "quantiles_global"  # Quantile distribution without year (global) - ensemble data
 
 
@@ -72,8 +70,7 @@ class PowerCurveManager:
             - Otherwise → QUANTILES_GLOBAL
             (single global quantile distribution, no time(year, month or hour) separation).
         - If there is no ``probability`` column → assume WTK-style time-series data.
-            - If it has a combined ``mohr`` column (month+hour encoding), or
-            separate ``month`` and ``hour`` columns → TIMESERIES.
+            - If it has a combined ``mohr`` column (month+hour encoding) or ``time`` column → TIMESERIES.
         - Fallback: if none of the expected markers are found, default to
         TIMESERIES, but subsequent processing may still raise errors if critical
         columns are missing.
@@ -88,6 +85,7 @@ class PowerCurveManager:
         has_year = "year" in cols
         has_mohr = "mohr" in cols
         has_month_hour = "month" in cols and "hour" in cols
+        has_time = "time" in cols  ## to support ERA5 timeseries
 
         if has_prob:
             if has_year:
@@ -95,7 +93,7 @@ class PowerCurveManager:
             else:
                 return DatasetSchema.QUANTILES_GLOBAL
         # No probability column → treat as WTK-like time series
-        if has_mohr or has_month_hour:
+        if has_mohr or has_month_hour or has_time:
             return DatasetSchema.TIMESERIES
         # Fall back: if neither, assume WTK-like (time-series) but raise if critical cols are missing later
         return DatasetSchema.TIMESERIES
@@ -290,10 +288,63 @@ class PowerCurveManager:
         mid_df[f"{ws_col}_kw"] = power_curve.windspeed_to_kw(mid_df, ws_col)
         return mid_df
 
+    def _normalize_timeseries_time_fields(self, work: pd.DataFrame) -> pd.DataFrame:
+        """
+        Ensure TIMESERIES inputs have year/month/hour columns.
+        Supports:
+            - ERA5 Timeseries with 'time' column (datetime-like or string)
+            - WTK 1224 Timeseries with 'mohr' (month*100+hour)
+        Adds time attributes and return df
+        """
+        has_year = "year" in work.columns
+        has_month = "month" in work.columns
+        has_hour = "hour" in work.columns
+
+        if has_year and has_month and has_hour:
+            return work
+
+        # 1. Checking for "time" column
+        if "time" in work.columns:
+            time = pd.to_datetime(work["time"], errors="coerce", utc=False)
+            if not has_year:
+                work["year"] = time.dt.year.astype(int)
+            if not has_month:
+                work["month"] = time.dt.month.astype(int)
+            if not has_hour:
+                work["hour"] = time.dt.hour.astype(int)
+            
+            # Optionally checking for day
+            if "day" not in work.columns:
+                work["day"] = time.dt.day.astype(int)
+    
+            work["time"] = time
+
+            return work
+
+        # 2. Checking for mohr column
+        elif "mohr" in work.columns:
+            mohr = pd.to_numeric(work["mohr"], errors="coerce")
+            if not has_month:
+                work["month"] = (mohr // 100).astype(int)
+            if not has_hour:
+                work["hour"] = (mohr % 100).astype(int)
+            if not has_year:
+                raise ValueError("Cannot extract 'year' from 'mohr' column." \
+                "Year must be present from the data returned from Athena source or" \
+                "provided through another time column.")
+            
+            # year is already there as WTK uses athena as source not direct S3
+            return work
+        
+        else:
+            raise ValueError("No recognized time column found. "\
+            "Dataset must contain either 'time' (datetime) or 'mohr' (month-hour encoding) column "\
+            "for timeseries normalization.")
+
     def compute_energy_production_df(
         self,
         df: pd.DataFrame,
-        height: int,
+        heights: Union[int,List[int]],
         selected_power_curve: str,
         relevant_columns_only: bool = True,
     ) -> pd.DataFrame:
@@ -302,7 +353,7 @@ class PowerCurveManager:
 
         Args:
             df (pd.DataFrame): Dataframe containing wind speed data.
-            height (int): Height in meters for which to estimate power production.
+            heights (int or List[int]): Heights in meters for which to estimate power production.
             selected_power_curve (str): Name of the selected power curve.
             relevant_columns_only (bool): If True, returns only relevant columns.
 
@@ -312,27 +363,39 @@ class PowerCurveManager:
             - Quantiles-with-year: ["year", ws_col, f"{ws_col}_kw"] for midpoint bins
             - Global-quantiles: ["year"(absent), ws_col, f"{ws_col}_kw"] for midpoint bins
         """
-        ws_col = f"windspeed_{height}m"
-        if ws_col not in df.columns:
-            raise KeyError(f"Expected column '{ws_col}' in input dataframe.")
+        if df is None or df.empty:
+            return df
+
+        if isinstance(heights, int):
+            heights = [heights]
+        
+        if not heights:
+            raise ValueError("heights parameter cannot be empty. Provide at least one height value.")
+
+        ws_cols = [f"windspeed_{height}m" for height in heights]
+
+        for ws_col in ws_cols:
+            if ws_col not in df.columns:
+                raise KeyError(f"Expected column '{ws_col}' in input dataframe.")
 
         schema = self._classify_schema(df)
         power_curve = self.get_curve(selected_power_curve)
 
         if schema == DatasetSchema.TIMESERIES:
-            # era5 data doesn't have month and hour columns
             work = df.copy()
-            if "month" not in work.columns or "hour" not in work.columns:
-                if "mohr" not in work.columns:
-                    raise KeyError(
-                        "WTK-like input requires 'mohr' or explicit 'month' and 'hour' columns."
-                    )
-                work["month"], work["hour"] = work["mohr"] // 100, work["mohr"] % 100
+            work = self._normalize_timeseries_time_fields(work)
 
-            work[f"{ws_col}_kw"] = power_curve.windspeed_to_kw(work, ws_col)
+            for ws_col in ws_cols:
+                work[f"{ws_col}_kw"] = power_curve.windspeed_to_kw(work, ws_col)
+
             if relevant_columns_only:
-                cols = ["year", "mohr", "month", "hour", ws_col, f"{ws_col}_kw"]
+                cols = []
+                for temporal_col in ["time", "year", "month", "day", "hour", "mohr"]:
+                    if temporal_col in work.columns:
+                        cols.append(temporal_col)
+                cols += ws_cols + [f"{ws_col}_kw" for ws_col in ws_cols]
                 return work[cols]
+            
             return work
 
         elif schema == DatasetSchema.QUANTILES_WITH_YEAR:
@@ -341,29 +404,56 @@ class PowerCurveManager:
             for year, group in df.groupby("year"):
                 # sorting by probability is important since the records might be shuffled by "groupby" and we are using midpoint method.
                 group = group.sort_values("probability").reset_index(drop=True)
-                mid_df = self._quantiles_to_kw_midpoints(
-                    group, ws_col, power_curve, use_swi=use_swi_eff
-                )
-                mid_df.insert(0, "year", year)
-                records.append(mid_df)
-            out = (
-                pd.concat(records, ignore_index=True)
-                if records
-                else pd.DataFrame(columns=["year", ws_col, f"{ws_col}_kw"])
-            )
-            return (
-                out
-                if not relevant_columns_only
-                else out[["year", ws_col, f"{ws_col}_kw"]]
-            )
+                col_dfs = []
+
+                # Process remaining ws_cols
+                for ws_col in ws_cols:
+                    mid_df = self._quantiles_to_kw_midpoints(
+                        group[["probability", ws_col]].copy(),
+                        ws_col,
+                        power_curve,
+                        use_swi=use_swi_eff,
+                    )
+                    col_dfs.append(mid_df)
+                result_df = pd.concat(col_dfs, axis=1)
+                result_df["year"] = year
+                records.append(result_df)
+
+            out = pd.concat(records, ignore_index=True) if records else pd.DataFrame()
+
+            if not relevant_columns_only:
+                return out
+
+            cols = ["year"]
+            for h in heights:
+                ws_col = f"windspeed_{h}m"
+                cols += [ws_col, f"{ws_col}_kw"]
+            return out[cols]
 
         else:  # DatasetSchema.QUANTILES_GLOBAL
             use_swi_eff = self._use_swi_for(schema)
             group = df.sort_values("probability").reset_index(drop=True)
-            out = self._quantiles_to_kw_midpoints(
-                group, ws_col, power_curve, use_swi=use_swi_eff
-            )
-            return out if not relevant_columns_only else out[[ws_col, f"{ws_col}_kw"]]
+            col_dfs = []
+
+            for ws_col in ws_cols:
+                mid_df = self._quantiles_to_kw_midpoints(
+                    group[["probability", ws_col]].copy(),
+                    ws_col,
+                    power_curve,
+                    use_swi=use_swi_eff,
+                )
+                col_dfs.append(mid_df)
+            
+            out = pd.concat(col_dfs, axis=1) if col_dfs else pd.DataFrame()
+
+            if not relevant_columns_only:
+                return out
+
+            cols = []
+            for h in heights:
+                ws_col = f"windspeed_{h}m"
+                cols += [ws_col, f"{ws_col}_kw"]
+            return out[cols]
 
     def prepare_yearly_production_df(
         self, df: pd.DataFrame, height: int, selected_power_curve: str
@@ -557,17 +647,22 @@ class PowerCurveManager:
         kw_column = f"windspeed_{height}m_kw"
 
         work = prod_df.drop(
-            columns=["mohr", "year", "hour"]
-            + [col for col in prod_df.columns if "winddirection" in col],
+            columns=[col for col in prod_df.columns if "winddirection" in col],
             errors="ignore",
         )
 
         res = work.groupby("month").agg(
             avg_ws=(ws_column, "mean"), kwh_total=(kw_column, "sum")
         )
+
+        # Number of years actually present in the data
+        n_years = prod_df["year"].nunique()
+        if n_years == 0:
+            raise ValueError("No valid years found in timeseries data.")
+
         res["kwh_total"] *= (
-            30 / 20.0
-        )  # Approximation: 30 days per month, averaged over 20 years
+            30 / n_years
+        )  # Approximation: 30 days per month, averaged over n_years years
 
         res.rename(
             columns={"avg_ws": "Average wind speed (m/s)", "kwh_total": "kWh produced"},
