@@ -30,7 +30,7 @@ export function PowerCurveSettings() {
   const getTurbineLabel = (turbineId: string): string => {
     const turbineInfo = TURBINE_DATA[turbineId];
     const baseName = POWER_CURVE_LABEL[turbineId] || turbineId;
-    
+
     if (turbineInfo) {
       return `${baseName} (${turbineInfo.minHeight}-${turbineInfo.maxHeight}m)`;
     }
@@ -67,9 +67,7 @@ export function PowerCurveSettings() {
             </Select>
           </>
         ) : (
-          <Typography variant="body2">
-            Loading turbine options...
-          </Typography>
+          <Typography variant="body2">Loading turbine options...</Typography>
         )}
 
         <Typography variant="body2" marginTop={2} gutterBottom>

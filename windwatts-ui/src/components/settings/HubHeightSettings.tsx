@@ -44,12 +44,16 @@ export function HubHeightSettings() {
   };
 
   const turbineData: TurbineInfo | undefined = TURBINE_DATA[powerCurve];
-  
-  const isHeightInRange: boolean = turbineData 
+
+  const isHeightInRange: boolean = turbineData
     ? hubHeight >= turbineData.minHeight && hubHeight <= turbineData.maxHeight
     : true;
 
-  const validationColor: "primary" | "success" | "error" = turbineData ? (isHeightInRange ? "success" : "error") : "primary";
+  const validationColor: "primary" | "success" | "error" = turbineData
+    ? isHeightInRange
+      ? "success"
+      : "error"
+    : "primary";
 
   return (
     <Box sx={{ mt: 2 }}>
@@ -59,7 +63,7 @@ export function HubHeightSettings() {
       <Typography variant="body1" gutterBottom>
         Choose a closest value (in meters) to the considered hub height:
       </Typography>
-      
+
       {turbineData && (
         <Paper
           sx={{
@@ -72,7 +76,8 @@ export function HubHeightSettings() {
         >
           <Typography variant="body2">
             <strong>
-              {isHeightInRange ? "Within" : "Outside"} recommended range - ({turbineData.minHeight}m - {turbineData.maxHeight}m)
+              {isHeightInRange ? "Within" : "Outside"} recommended range - (
+              {turbineData.minHeight}m - {turbineData.maxHeight}m)
             </strong>
           </Typography>
         </Paper>

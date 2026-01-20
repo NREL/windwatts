@@ -214,10 +214,10 @@ def get_production(
 def _get_available_turbines(field_name: str = "turbines"):
     """
     Retrieve all available turbines/power curves.
-    
+
     Returns sorted list with NLR reference turbines first (by capacity),
     followed by other turbines alphabetically.
-    
+
     Args:
         field_name: "turbines" or "power curves"
     """
@@ -286,7 +286,7 @@ def get_powercurves():
     Power curves are model-agnostic and can be used with any dataset (era5, wtk, ensemble).
     """
     try:
-        return _get_available_turbines("power curves")
+        return _get_available_turbines("power_curves")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
 
