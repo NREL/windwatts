@@ -73,6 +73,21 @@ WindSpeedResponse = Union[
 ]
 
 
+class AvailableTurbinesResponse(BaseModel):
+    available_turbines: List[str]
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "available_turbines": [
+                    "nlr-reference-2.5kW",
+                    "nlr-reference-100kW",
+                ]
+            }
+        }
+    }
+
+
 class AvailablePowerCurvesResponse(BaseModel):
     available_power_curves: List[str]
 
