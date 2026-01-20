@@ -156,8 +156,13 @@ def get_production(
     lat: float = Query(..., description="Latitude of the location"),
     lng: float = Query(..., description="Longitude of the location"),
     height: int = Query(..., description="Height in meters"),
-    powercurve: str = Query(
-        ..., description="Power curve identifier (e.g., nrel-reference-100kW)"
+    turbine: Optional[str] = Query(
+        None, description="Turbine model identifier (e.g., nrl-reference-100kW)"
+    ),
+    powercurve: Optional[str] = Query(
+        None,
+        deprecated=True,
+        description="Deprecated: use 'turbine' instead. Power curve identifier.",
     ),
     period: str = Query(
         "all",
@@ -169,13 +174,14 @@ def get_production(
     ),
 ):
     """
-    Retrieve energy production estimates for a specific location, height, and power curve.
+    Retrieve energy production estimates for a specific location, height, and turbine.
 
     - **model**: Data model (era5, wtk, ensemble)
     - **lat**: Latitude (varies by model, refer info endpoint for coordinate bounds)
     - **lng**: Longitude (varies by model, refer info endpoint for coordinate bounds)
     - **height**: Height in meters (varies by model, refer info endpoint for the available heights)
-    - **powercurve**: Power curve to use for calculations
+    - **turbine**: Turbine model to use for calculations
+    - **powercurve**: Deprecated parameter, use 'turbine' instead
     - **period**: Time aggregation period (default: all)
     - **source**: Optional data source override
     """
@@ -183,12 +189,20 @@ def get_production(
         # Catch invalid model before core function call
         model = validate_model(model)
 
+        # Backward compatibility for 'powercurve'
+        turbine = turbine or powercurve
+        if not turbine:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'turbine' or 'powercurve' parameter is required",
+            )
+
         # Use default source if not provided
         if source is None:
             source = MODEL_CONFIG.get(model, {}).get("default_source", "athena")
 
         return get_production_core(
-            model, lat, lng, height, powercurve, period, source, data_fetcher_router
+            model, lat, lng, height, turbine, period, source, data_fetcher_router
         )
     except HTTPException:
         raise
