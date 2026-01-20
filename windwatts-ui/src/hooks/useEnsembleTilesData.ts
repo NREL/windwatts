@@ -51,7 +51,7 @@ export const useEnsembleTilesData = () => {
           lat: lat!,
           lng: lng!,
           hubHeight,
-          powerCurve,
+          turbine: powerCurve,
           dataModel,
           period: "all",
         }),

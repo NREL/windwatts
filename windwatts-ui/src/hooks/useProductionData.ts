@@ -41,7 +41,7 @@ export const useProductionData = () => {
         lat: lat!,
         lng: lng!,
         hubHeight,
-        powerCurve,
+        turbine: powerCurve,
         dataModel,
         period: "full",
       }),

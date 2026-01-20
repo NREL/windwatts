@@ -1,13 +1,14 @@
 import { useContext, useEffect, useMemo } from "react";
 import { SettingsContext } from "../../providers/SettingsContext";
-import { Box, Slider, Typography } from "@mui/material";
-import { HUB_HEIGHTS } from "../../constants";
+import { Box, Slider, Typography, Paper } from "@mui/material";
+import { HUB_HEIGHTS, TURBINE_DATA, TurbineInfo } from "../../constants";
 
 export function HubHeightSettings() {
   const {
     hubHeight,
     setHubHeight,
     preferredModel: dataModel,
+    powerCurve,
   } = useContext(SettingsContext);
 
   const { values: availableHeights, interpolation: step } = useMemo(() => {
@@ -42,6 +43,18 @@ export function HubHeightSettings() {
     }
   };
 
+  const turbineData: TurbineInfo | undefined = TURBINE_DATA[powerCurve];
+
+  const isHeightInRange: boolean = turbineData
+    ? hubHeight >= turbineData.minHeight && hubHeight <= turbineData.maxHeight
+    : true;
+
+  const validationColor: "primary" | "success" | "error" = turbineData
+    ? isHeightInRange
+      ? "success"
+      : "error"
+    : "primary";
+
   return (
     <Box sx={{ mt: 2 }}>
       <Typography variant="h6" gutterBottom>
@@ -50,6 +63,26 @@ export function HubHeightSettings() {
       <Typography variant="body1" gutterBottom>
         Choose a closest value (in meters) to the considered hub height:
       </Typography>
+
+      {turbineData && (
+        <Paper
+          sx={{
+            p: 1.5,
+            mb: 2,
+            backgroundColor: `${validationColor}.light`,
+            borderLeft: `4px solid`,
+            borderLeftColor: `${validationColor}.main`,
+          }}
+        >
+          <Typography variant="body2">
+            <strong>
+              {isHeightInRange ? "Within" : "Outside"} recommended range - (
+              {turbineData.minHeight}m - {turbineData.maxHeight}m)
+            </strong>
+          </Typography>
+        </Paper>
+      )}
+
       <Slider
         value={hubHeight}
         onChange={handleHubHeightChange}
@@ -60,6 +93,7 @@ export function HubHeightSettings() {
         marks={hubHeightMarks}
         min={Math.min(...availableHeights)}
         max={Math.max(...availableHeights)}
+        color={validationColor}
       />
     </Box>
   );

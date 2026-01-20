@@ -12,7 +12,7 @@ export interface EnergyProductionRequest {
   lat: number;
   lng: number;
   hubHeight: number;
-  powerCurve: string;
+  turbine: string;
   dataModel: DataModel;
   period?: string;
 }

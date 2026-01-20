@@ -85,6 +85,11 @@ def validate_powercurve(powercurve: str) -> str:
     return powercurve
 
 
+def validate_turbine(turbine: str) -> str:
+    """Validate turbine name (alias for validate_powercurve for clarity)"""
+    return validate_powercurve(turbine)
+
+
 def validate_year(year: int, model: str) -> int:
     """Validate year for given model"""
     valid_years = MODEL_CONFIG[model]["years"].get("full", [])

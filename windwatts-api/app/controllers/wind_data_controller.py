@@ -21,6 +21,7 @@ from app.utils.wind_data_core import (
 
 from app.power_curve.global_power_curve_manager import power_curve_manager
 from app.schemas import (
+    AvailableTurbinesResponse,
     WindSpeedResponse,
     AvailablePowerCurvesResponse,
     EnergyProductionResponse,
@@ -156,8 +157,13 @@ def get_production(
     lat: float = Query(..., description="Latitude of the location"),
     lng: float = Query(..., description="Longitude of the location"),
     height: int = Query(..., description="Height in meters"),
-    powercurve: str = Query(
-        ..., description="Power curve identifier (e.g., nrel-reference-100kW)"
+    turbine: Optional[str] = Query(
+        None, description="Turbine model identifier (e.g., nrl-reference-100kW)"
+    ),
+    powercurve: Optional[str] = Query(
+        None,
+        deprecated=True,
+        description="Deprecated: use 'turbine' instead. Power curve identifier.",
     ),
     period: str = Query(
         "all",
@@ -169,13 +175,14 @@ def get_production(
     ),
 ):
     """
-    Retrieve energy production estimates for a specific location, height, and power curve.
+    Retrieve energy production estimates for a specific location, height, and turbine.
 
     - **model**: Data model (era5, wtk, ensemble)
     - **lat**: Latitude (varies by model, refer info endpoint for coordinate bounds)
     - **lng**: Longitude (varies by model, refer info endpoint for coordinate bounds)
     - **height**: Height in meters (varies by model, refer info endpoint for the available heights)
-    - **powercurve**: Power curve to use for calculations
+    - **turbine**: Turbine model to use for calculations
+    - **powercurve**: Deprecated parameter, use 'turbine' instead
     - **period**: Time aggregation period (default: all)
     - **source**: Optional data source override
     """
@@ -183,15 +190,76 @@ def get_production(
         # Catch invalid model before core function call
         model = validate_model(model)
 
+        # Backward compatibility for 'powercurve'
+        turbine = turbine or powercurve
+        if not turbine:
+            raise HTTPException(
+                status_code=400,
+                detail="Either 'turbine' or 'powercurve' parameter is required",
+            )
+
         # Use default source if not provided
         if source is None:
             source = MODEL_CONFIG.get(model, {}).get("default_source", "athena")
 
         return get_production_core(
-            model, lat, lng, height, powercurve, period, source, data_fetcher_router
+            model, lat, lng, height, turbine, period, source, data_fetcher_router
         )
     except HTTPException:
         raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+def _get_available_turbines(field_name: str = "turbines"):
+    """
+    Retrieve all available turbines/power curves.
+
+    Returns sorted list with NLR reference turbines first (by capacity),
+    followed by other turbines alphabetically.
+
+    Args:
+        field_name: "turbines" or "power curves"
+    """
+    all_curves = list(power_curve_manager.power_curves.keys())
+
+    def extract_kw(curve_name: str):
+        # Extracts the kw value from nlr curves, e.g. "nlr-reference-2.5kW" -> 2.5
+        match = re.search(r"nlr-reference-([0-9.]+)kW", curve_name)
+        if match:
+            return float(match.group(1))
+        return float("inf")
+
+    nlr_curves = [c for c in all_curves if c.startswith("nlr-reference-")]
+    other_curves = [c for c in all_curves if not c.startswith("nlr-reference-")]
+
+    nlr_curves_sorted = sorted(nlr_curves, key=extract_kw)
+    other_curves_sorted = sorted(other_curves)
+
+    ordered_curves = nlr_curves_sorted + other_curves_sorted
+    return {f"available_{field_name}": ordered_curves}
+
+
+@router.get(
+    "/turbines",
+    summary="Fetch all available turbines",
+    response_model=AvailableTurbinesResponse,
+    responses={
+        200: {
+            "description": "Available turbines retrieved successfully",
+            "model": AvailableTurbinesResponse,
+        },
+        500: {"description": "Internal server error"},
+    },
+)
+def get_turbines():
+    """
+    Retrieve a list of all available turbines.
+
+    Turbines are model-agnostic and can be used with any dataset (era5, wtk, ensemble).
+    """
+    try:
+        return _get_available_turbines("turbines")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
 
@@ -200,6 +268,7 @@ def get_production(
     "/powercurves",
     summary="Fetch all available power curves",
     response_model=AvailablePowerCurvesResponse,
+    deprecated=True,
     responses={
         200: {
             "description": "Available power curves retrieved successfully",
@@ -212,26 +281,12 @@ def get_powercurves():
     """
     Retrieve a list of all available power curves.
 
+    Deprecated: Use /turbines endpoint instead.
+
     Power curves are model-agnostic and can be used with any dataset (era5, wtk, ensemble).
     """
     try:
-        all_curves = list(power_curve_manager.power_curves.keys())
-
-        def extract_kw(curve_name: str):
-            # Extracts the kw value from nrel curves, e.g. "nrel-reference-2.5kW" -> 2.5
-            match = re.search(r"nrel-reference-([0-9.]+)kW", curve_name)
-            if match:
-                return float(match.group(1))
-            return float("inf")
-
-        nrel_curves = [c for c in all_curves if c.startswith("nrel-reference-")]
-        other_curves = [c for c in all_curves if not c.startswith("nrel-reference-")]
-
-        nrel_curves_sorted = sorted(nrel_curves, key=extract_kw)
-        other_curves_sorted = sorted(other_curves)
-
-        ordered_curves = nrel_curves_sorted + other_curves_sorted
-        return {"available_power_curves": ordered_curves}
+        return _get_available_turbines("power_curves")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
 

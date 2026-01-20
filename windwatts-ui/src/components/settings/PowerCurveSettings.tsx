@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { SettingsContext } from "../../providers/SettingsContext";
 import { useContext } from "react";
 import { getAvailablePowerCurves } from "../../services/api";
-import { POWER_CURVE_LABEL } from "../../constants";
+import { POWER_CURVE_LABEL, TURBINE_DATA } from "../../constants";
 
 const DefaultPowerCurveOptions = [
   "nlr-reference-2.5kW",
@@ -27,44 +27,51 @@ export function PowerCurveSettings() {
     setPowerCurve(event.target.value as string);
   };
 
+  const getTurbineLabel = (turbineId: string): string => {
+    const turbineInfo = TURBINE_DATA[turbineId];
+    const baseName = POWER_CURVE_LABEL[turbineId] || turbineId;
+
+    if (turbineInfo) {
+      return `${baseName} (${turbineInfo.minHeight}-${turbineInfo.maxHeight}m)`;
+    }
+    return baseName;
+  };
+
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h6" gutterBottom>
-        Power Curve
+        Turbine
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Select a power curve option:
+        Select a turbine option:
       </Typography>
 
       <FormControl component="fieldset" sx={{ width: "100%" }}>
         {powerCurveOptions.length > 0 ? (
           <>
-            {/* <InputLabel id="power-curve-label">Power Curve</InputLabel> */}
+            {/* <InputLabel id="power-curve-label">Turbine</InputLabel> */}
             <Select
               labelId="power-curve-label"
               id="power-curve-select"
               value={powerCurve}
-              // label="Power Curve"
+              // label="Turbine"
               onChange={handlePowerCurveChange}
               fullWidth
               size="small"
             >
               {powerCurveOptions.map((option, idx) => (
                 <MenuItem key={"power_curve_option_" + idx} value={option}>
-                  {POWER_CURVE_LABEL[option] || option}
+                  {getTurbineLabel(option)}
                 </MenuItem>
               ))}
             </Select>
           </>
         ) : (
-          <Typography variant="body2">
-            Loading power curve options...
-          </Typography>
+          <Typography variant="body2">Loading turbine options...</Typography>
         )}
 
         <Typography variant="body2" marginTop={2} gutterBottom>
-          * Make sure the selected turbine class matches the hub height (higher
-          hub heights should be chosen for larger turbines).
+          * The height range shows recommended hub height for this turbine.
         </Typography>
       </FormControl>
     </Box>
