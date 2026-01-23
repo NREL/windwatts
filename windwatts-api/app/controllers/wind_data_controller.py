@@ -141,6 +141,7 @@ def get_windspeed(
     "/{model}/production",
     summary="Get energy production estimate for a location with a power curve",
     response_model=EnergyProductionResponse,
+    response_model_exclude_none=True,
     responses={
         200: {
             "description": "Energy production data retrieved successfully",

@@ -8,6 +8,7 @@ and timeseries data from various data sources.
 from typing import List
 from fastapi import HTTPException
 from app.data_fetchers.data_fetcher_router import DataFetcherRouter
+from app.config.model_config import MODEL_CONFIG
 
 from app.utils.validation import (
     validate_lat,
@@ -141,29 +142,36 @@ def get_production_core(
         return {"monthly_avg_energy_production": monthly_avg_energy_production}
 
     elif period == "full":
+        # only include valid period_types for production with respect to model
+        valid_periods = MODEL_CONFIG[model]["period_type"].get("production", [])
+        valid_periods = [p for p in valid_periods if p != "full"]
+
         summary_avg_energy_production = (
             power_curve_manager.calculate_energy_production_summary(
                 df, height, powercurve
             )
         )
-        yearly_avg_energy_production = (
-            power_curve_manager.calculate_yearly_energy_production(
-                df, height, powercurve
-            )
-        )
-        monthly_avg_energy_production = (
-            power_curve_manager.calculate_monthly_energy_production(
-                df, height, powercurve
-            )
-        )
-        return {
-            "energy_production": summary_avg_energy_production["Average year"][
-                "kWh produced"
-            ],
+
+        response_dict = {
             "summary_avg_energy_production": summary_avg_energy_production,
-            "yearly_avg_energy_production": yearly_avg_energy_production,
-            "monthly_avg_energy_production": monthly_avg_energy_production
+            "energy_production": summary_avg_energy_production["Average year"]["kWh produced"],
         }
+
+        if "annual" in valid_periods:
+            response_dict["yearly_avg_energy_production"] = (
+                power_curve_manager.calculate_yearly_energy_production(
+                    df, height, powercurve
+                )
+            )
+
+        if "monthly" in valid_periods:
+            response_dict["monthly_avg_energy_production"] = (
+                power_curve_manager.calculate_monthly_energy_production(
+                    df, height, powercurve
+                )
+            )
+
+        return response_dict
 
 
 def get_timeseries_core(
