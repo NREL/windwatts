@@ -16,7 +16,7 @@ export const AnalysisResults = () => {
   return (
     <Stack spacing={2}>
       {/* Top row: either Wind Speed + Resource, or Ensemble Model tiles */}
-      {preferredModel === "ensemble" ? (
+      {preferredModel === "ensemble-quantiles" ? (
         <>
           <Divider
             textAlign="center"

@@ -13,13 +13,13 @@ export const DataSourceLinks = ({
       <Link
         href={
           DATA_MODEL_INFO[preferredModel]?.source_href ||
-          DATA_MODEL_INFO.era5.source_href
+          DATA_MODEL_INFO['era5-quantiles'].source_href
         }
         target="_blank"
         rel="noopener noreferrer"
         underline="hover"
       >
-        {DATA_MODEL_INFO[preferredModel]?.label || DATA_MODEL_INFO.era5.label}{" "}
+        {DATA_MODEL_INFO[preferredModel]?.label || DATA_MODEL_INFO['era5-quantiles'].label}{" "}
         reanalysis data
       </Link>{" "}
       &mdash;{" "}

@@ -46,14 +46,14 @@ export const ProductionCard = memo(() => {
 
   const title = "Production";
   // Always show ERA5 in the subheader since production always uses ERA5 data
-  const productionModelDisplay = dataModel.toUpperCase();
+  const productionModelDisplay = dataModel.split('-')[0].toUpperCase();
   const subheader = (
     <>
       Estimated Annual Production Potential from{" "}
       <Link
         href={
           DATA_MODEL_INFO[dataModel]?.source_href ||
-          DATA_MODEL_INFO.era5.source_href
+          DATA_MODEL_INFO['era5-quantiles'].source_href
         }
         target="_blank"
         rel="noopener noreferrer"

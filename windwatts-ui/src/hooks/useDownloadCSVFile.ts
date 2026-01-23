@@ -12,7 +12,7 @@ import { GridLocation } from "../types";
 export const useDownloadCSVFile = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const { currentPosition, preferredModel } = useContext(SettingsContext);
-  const dataModel = preferredModel === "ensemble" ? "era5" : preferredModel;
+  const dataModel = preferredModel === "ensemble-quantiles" ? "era5-quantiles" : preferredModel;
   const { lat, lng } = currentPosition || {};
 
   const canDownload = !!(lat && lng && dataModel);
@@ -65,7 +65,7 @@ export const useDownloadCSVFile = () => {
 
 export const useNearestGridLocation = (n_neighbors: number = 1) => {
   const { currentPosition, preferredModel } = useContext(SettingsContext);
-  const dataModel = preferredModel === "ensemble" ? "era5" : preferredModel;
+  const dataModel = preferredModel === "ensemble-quantiles" ? "era5-quantiles" : preferredModel;
   const { lat, lng } = currentPosition || {};
 
   const shouldFetch = lat && lng && dataModel;

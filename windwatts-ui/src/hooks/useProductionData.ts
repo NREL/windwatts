@@ -14,7 +14,7 @@ export const useProductionData = () => {
     lossAssumptionFactor,
   } = useContext(SettingsContext);
   // Always use ERA5 for production calculations, even when ensemble is selected
-  const dataModel = preferredModel === "ensemble" ? "era5" : preferredModel;
+  const dataModel = preferredModel === "ensemble-quantiles" ? "era5-quantiles" : preferredModel;
   const { lat, lng } = currentPosition || {};
   const outOfBounds =
     lat && lng && dataModel ? isOutOfBounds(lat, lng, dataModel) : false;

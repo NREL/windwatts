@@ -44,7 +44,7 @@ export const defaultValues: StoredSettings = {
   zoom: 12,
   hubHeight: 40,
   powerCurve: "nlr-reference-100kW",
-  preferredModel: "era5",
+  preferredModel: "era5-quantiles",
   lossAssumptionFactor: 1.0, // 1.0 = 0% loss, 0.83 = 17% loss defaulted to 0% loss
   windspeedUnit: "mph",
 };

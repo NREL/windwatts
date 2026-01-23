@@ -1,4 +1,4 @@
-export type DataModel = "wtk" | "era5" | "ensemble";
+export type DataModel = "wtk-timeseries" | "era5-quantiles" | "ensemble-quantiles";
 
 export type DataModelInfo = {
   label: string;
