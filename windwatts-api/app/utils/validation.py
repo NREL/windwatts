@@ -14,18 +14,18 @@ def validate_model(model: str) -> str:
     if model not in MODEL_CONFIG:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid model. Must be one of: {list(MODEL_CONFIG.keys())}",
+            detail=f"Invalid model. Must be one of: {list(MODEL_CONFIG.keys())}. But got f{model} instead.",
         )
     return model
 
 
 def validate_source(model: str, source: str) -> str:
     """Validate source for given model"""
-    valid_sources = MODEL_CONFIG[model]["sources"]
-    if source not in valid_sources:
+    valid_source = MODEL_CONFIG[model]["source"]
+    if source != valid_source:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid source for {model}. Must be one of: {valid_sources}",
+            detail=f"Invalid source for {model}. Must be : {valid_source}",
         )
     return source
 

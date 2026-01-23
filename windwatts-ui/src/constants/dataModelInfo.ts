@@ -1,7 +1,7 @@
 import { DataModelInfo } from "../types";
 
 export const DATA_MODEL_INFO: Record<string, DataModelInfo> = {
-  era5: {
+  "era5-quantiles": {
     label: "ERA5",
     source_href:
       "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5",
@@ -11,7 +11,7 @@ export const DATA_MODEL_INFO: Record<string, DataModelInfo> = {
     wind_speed_heights: ["10m", "30m", "40m", "50m", "60m", "80m", "100m"],
     wind_direction_heights: ["10m", "100m"],
   },
-  wtk: {
+  "wtk-timeseries": {
     label: "NLR's 20-year WTK-LED dataset",
     source_href:
       "https://www.energy.gov/eere/wind/articles/new-wind-resource-database-includes-updated-wind-toolkit",

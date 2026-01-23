@@ -22,7 +22,7 @@ export const useEnsembleTilesData = () => {
     hubHeight &&
     powerCurve &&
     dataModel &&
-    dataModel === "ensemble" &&
+    dataModel === "ensemble-quantiles" &&
     !outOfBounds
   );
 

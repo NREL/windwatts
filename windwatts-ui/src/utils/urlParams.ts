@@ -17,7 +17,7 @@ export const URL_PARAM_DEFAULTS = {
   zoom: 12,
   hubHeight: 40,
   powerCurve: "nlr-reference-100kW",
-  dataModel: "era5" as DataModel,
+  dataModel: "era5-quantiles" as DataModel,
   lossAssumption: 0,
   windspeedUnit: "mph",
 };
@@ -65,7 +65,7 @@ export function parseUrlParams(searchParams?: URLSearchParams): UrlParams {
   }
 
   const dataModel = params.get("dataModel");
-  if (dataModel === "era5" || dataModel === "wtk" || dataModel === "ensemble") {
+  if (dataModel === "era5-quantiles" || dataModel === "wtk-timeseries" || dataModel === "ensemble-quantiles" || dataModel === "era5-timeseries") {
     result.dataModel = dataModel;
   }
 

@@ -5,9 +5,12 @@ Provides the core business logic for fetching wind speed, energy production,
 and timeseries data from various data sources.
 """
 
-from typing import List
+from typing import List, Union
 from fastapi import HTTPException
 from app.data_fetchers.data_fetcher_router import DataFetcherRouter
+import pandas as pd
+from io import StringIO
+from app.config.model_config import MODEL_CONFIG
 
 from app.utils.validation import (
     validate_lat,
@@ -107,7 +110,7 @@ def get_production_core(
     if period == "all":
         summary_avg_energy_production = (
             power_curve_manager.calculate_energy_production_summary(
-                df, height, powercurve
+                df, height, powercurve, model
             )
         )
         return {
@@ -119,7 +122,7 @@ def get_production_core(
     elif period == "summary":
         summary_avg_energy_production = (
             power_curve_manager.calculate_energy_production_summary(
-                df, height, powercurve
+                df, height, powercurve, model
             )
         )
         return {"summary_avg_energy_production": summary_avg_energy_production}
@@ -127,7 +130,7 @@ def get_production_core(
     elif period == "annual":
         yearly_avg_energy_production = (
             power_curve_manager.calculate_yearly_energy_production(
-                df, height, powercurve
+                df, height, powercurve, model
             )
         )
         return {"yearly_avg_energy_production": yearly_avg_energy_production}
@@ -135,35 +138,44 @@ def get_production_core(
     elif period == "monthly":
         monthly_avg_energy_production = (
             power_curve_manager.calculate_monthly_energy_production(
-                df, height, powercurve
+                df, height, powercurve, model
             )
         )
         return {"monthly_avg_energy_production": monthly_avg_energy_production}
 
     elif period == "full":
+        # Add only supported production period_type in full
+        valid_periods = MODEL_CONFIG[model]["period_type"].get("production", [])
+        valid_periods = [p for p in valid_periods if p != "full"]
+
+        response_dict = {}
+
         summary_avg_energy_production = (
-            power_curve_manager.calculate_energy_production_summary(
-                df, height, powercurve
+        power_curve_manager.calculate_energy_production_summary(
+            df, height, powercurve, model
             )
         )
-        yearly_avg_energy_production = (
-            power_curve_manager.calculate_yearly_energy_production(
-                df, height, powercurve
-            )
-        )
-        monthly_avg_energy_production = (
-            power_curve_manager.calculate_monthly_energy_production(
-                df, height, powercurve
-            )
-        )
-        return {
-            "energy_production": summary_avg_energy_production["Average year"][
-                "kWh produced"
-            ],
-            "summary_avg_energy_production": summary_avg_energy_production,
-            "yearly_avg_energy_production": yearly_avg_energy_production,
-            "monthly_avg_energy_production": monthly_avg_energy_production
+
+        response_dict = {
+        "summary_avg_energy_production": summary_avg_energy_production,
+        "energy_production": summary_avg_energy_production["Average year"]["kWh produced"],
         }
+
+        if "annual" in valid_periods:
+            response_dict["yearly_avg_energy_production"] = (
+                power_curve_manager.calculate_yearly_energy_production(
+                    df, height, powercurve, model
+                )
+            )
+
+        if "monthly" in valid_periods:
+            response_dict["monthly_avg_energy_production"] = (
+                power_curve_manager.calculate_monthly_energy_production(
+                    df, height, powercurve, model
+                )
+            )
+        
+        return response_dict
 
 
 def get_timeseries_core(
@@ -172,6 +184,7 @@ def get_timeseries_core(
     years: List[int],
     source: str,
     data_fetcher_router: DataFetcherRouter,
+    return_dataframe: bool = False
 ):
     """
     Core function to retrieve timeseries data for download.
@@ -182,13 +195,11 @@ def get_timeseries_core(
         years (List[int]): List of years to retrieve, default to sample years.
         source (str): Source of the data.
         data_fetcher_router: Router instance for fetching data.
+        return_dataframe: If True, return DataFrame instead of CSV string
 
     Returns:
-        str: CSV content as string.
+        str or pd.DataFrame: CSV content as string or DataFrame
     """
-    from io import StringIO
-    from app.config.model_config import MODEL_CONFIG
-
     model = validate_model(model)
     source = validate_source(model, source)
 
@@ -207,6 +218,9 @@ def get_timeseries_core(
             status_code=404, detail="No data found for the specified parameters"
         )
 
+    if return_dataframe:
+        return df
+    
     # Convert DataFrame to CSV string
     csv_io = StringIO()
     df.to_csv(csv_io, index=False)

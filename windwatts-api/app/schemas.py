@@ -147,8 +147,8 @@ class YearlyEnergyProductionResponse(BaseModel):
 class FullEnergyProductionResponse(BaseModel):
     energy_production: Numeric = Field(description="global-averaged kWh produced")
     summary_avg_energy_production: Dict[str, ValueMapAlphaNumericNone]
-    yearly_avg_energy_production: Dict[str, ValueMapAlphaNumeric]
-    monthly_avg_energy_production: Dict[str, ValueMapAlphaNumeric]
+    yearly_avg_energy_production: Optional[Dict[str, ValueMapAlphaNumeric]] = None
+    monthly_avg_energy_production: Optional[Dict[str, ValueMapAlphaNumeric]] = None
 
     model_config = {
         "json_schema_extra": {

@@ -20,7 +20,7 @@ export const useOutputUnit = () => {
 
     let shouldUseMWh = false;
 
-    if (preferredModel === "ensemble") {
+    if (preferredModel === "ensemble-quantiles") {
       // ensemble mode - auto-convert if either output >= 10,000
       const ensembleProduction = Number(ensembleData?.energy_production || 0);
       shouldUseMWh = ensembleProduction >= 10000 || prodAvg >= 10000;
