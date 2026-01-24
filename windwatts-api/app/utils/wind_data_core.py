@@ -5,12 +5,11 @@ Provides the core business logic for fetching wind speed, energy production,
 and timeseries data from various data sources.
 """
 
-from typing import List, Union
+from typing import List
 from fastapi import HTTPException
 from app.data_fetchers.data_fetcher_router import DataFetcherRouter
-import pandas as pd
 from io import StringIO
-from app.config.model_config import MODEL_CONFIG
+from app.config.model_config import MODEL_CONFIG, TEMPORAL_SCHEMAS
 
 from app.utils.validation import (
     validate_lat,
@@ -145,20 +144,23 @@ def get_production_core(
 
     elif period == "full":
         # Add only supported production period_type in full
-        valid_periods = MODEL_CONFIG[model]["period_type"].get("production", [])
+        schema = MODEL_CONFIG[model]["schema"]
+        valid_periods = TEMPORAL_SCHEMAS[schema]["period_type"].get("production", [])
         valid_periods = [p for p in valid_periods if p != "full"]
 
         response_dict = {}
 
         summary_avg_energy_production = (
-        power_curve_manager.calculate_energy_production_summary(
-            df, height, powercurve, model
+            power_curve_manager.calculate_energy_production_summary(
+                df, height, powercurve, model
             )
         )
 
         response_dict = {
-        "summary_avg_energy_production": summary_avg_energy_production,
-        "energy_production": summary_avg_energy_production["Average year"]["kWh produced"],
+            "summary_avg_energy_production": summary_avg_energy_production,
+            "energy_production": summary_avg_energy_production["Average year"][
+                "kWh produced"
+            ],
         }
 
         if "annual" in valid_periods:
@@ -174,7 +176,7 @@ def get_production_core(
                     df, height, powercurve, model
                 )
             )
-        
+
         return response_dict
 
 
@@ -184,7 +186,7 @@ def get_timeseries_core(
     years: List[int],
     source: str,
     data_fetcher_router: DataFetcherRouter,
-    return_dataframe: bool = False
+    return_dataframe: bool = False,
 ):
     """
     Core function to retrieve timeseries data for download.
@@ -220,7 +222,7 @@ def get_timeseries_core(
 
     if return_dataframe:
         return df
-    
+
     # Convert DataFrame to CSV string
     csv_io = StringIO()
     df.to_csv(csv_io, index=False)

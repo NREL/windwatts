@@ -1,4 +1,4 @@
-import { DataModel } from "../types";
+import { DataModel, DATA_MODELS } from "../types";
 import { MODEL_COORDINATES_BOUNDS, VALID_POWER_CURVES } from "../constants";
 
 export interface UrlParams {
@@ -65,8 +65,8 @@ export function parseUrlParams(searchParams?: URLSearchParams): UrlParams {
   }
 
   const dataModel = params.get("dataModel");
-  if (dataModel === "era5-quantiles" || dataModel === "wtk-timeseries" || dataModel === "ensemble-quantiles" || dataModel === "era5-timeseries") {
-    result.dataModel = dataModel;
+  if (dataModel && DATA_MODELS.includes(dataModel as DataModel)) {
+    result.dataModel = dataModel as DataModel;
   }
 
   const lossAssumption = params.get("lossAssumption");

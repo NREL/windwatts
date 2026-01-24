@@ -1,4 +1,11 @@
-export type DataModel = "wtk-timeseries" | "era5-quantiles" | "ensemble-quantiles";
+export const DATA_MODELS = [
+  "wtk-timeseries",
+  "era5-quantiles",
+  "ensemble-quantiles",
+  "era5-timeseries",
+] as const;
+
+export type DataModel = typeof DATA_MODELS[number];
 
 export type DataModelInfo = {
   label: string;

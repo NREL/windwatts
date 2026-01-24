@@ -176,7 +176,7 @@ class FullEnergyProductionResponse(BaseModel):
                 },
                 "monthly_avg_energy_production": {
                     "Jan": {"Average wind speed, m/s": "3.80", "kWh produced": 46141}
-                }
+                },
             }
         }
     }

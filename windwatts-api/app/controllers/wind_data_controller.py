@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import StreamingResponse
 import zipfile
@@ -7,7 +7,7 @@ import re
 import os
 
 from app.config_manager import ConfigManager
-from app.config.model_config import MODEL_CONFIG
+from app.config.model_config import MODEL_CONFIG, TEMPORAL_SCHEMAS
 from app.data_fetchers.s3_data_fetcher import S3DataFetcher
 from app.data_fetchers.athena_data_fetcher import AthenaDataFetcher
 from app.data_fetchers.data_fetcher_router import DataFetcherRouter
@@ -71,7 +71,12 @@ if not _skip_data_init:
 
     # Register fetchers with DataFetcherRouter
     # Register with simple names: athena, s3 (not athena_era5, s3_era5)
-    for model_key in ["era5-quantiles", "ensemble-quantiles", "wtk-timeseries", "era5-timeseries"]:
+    for model_key in [
+        "era5-quantiles",
+        "ensemble-quantiles",
+        "wtk-timeseries",
+        "era5-timeseries",
+    ]:
         if model_key in athena_data_fetchers:
             data_fetcher_router.register_fetcher(
                 f"athena_{model_key}", athena_data_fetchers[model_key]
@@ -251,7 +256,7 @@ def get_grid_points(
     model: str = Path(..., description="Data model: era5, wtk, or ensemble"),
     lat: float = Query(..., description="Latitude of the target location"),
     lng: float = Query(..., description="Longitude of the target location"),
-    limit: int = Query(1, description="Number of nearest grid points to return (1-4)")
+    limit: int = Query(1, description="Number of nearest grid points to return (1-4)"),
 ):
     """
     Find the nearest grid points to a given coordinate.
@@ -320,12 +325,13 @@ def get_model_info(
     try:
         model = validate_model(model)
         config = MODEL_CONFIG[model]
-
+        schema = config["schema"]
+        temporal_config = TEMPORAL_SCHEMAS[schema]
         return {
             "model": model,
             # "available_sources": config["sources"],
             # "default_source": config["default_source"],
-            "supported_periods": config["period_type"],
+            "supported_periods": temporal_config["period_type"],
             "available_years": config.get("years", {}).get("full", []),
             "available_heights": config.get("heights", []),
             "grid_info": config.get("grid_info", {}),

@@ -5,7 +5,7 @@ Validation functions for WindWatts API.
 import re
 from fastapi import HTTPException
 
-from app.config.model_config import MODEL_CONFIG
+from app.config.model_config import MODEL_CONFIG, TEMPORAL_SCHEMAS
 from app.power_curve.global_power_curve_manager import power_curve_manager
 
 
@@ -32,7 +32,8 @@ def validate_source(model: str, source: str) -> str:
 
 def validate_period_type(model: str, period_type: str, data_type: str) -> str:
     """Validate period parameter for given model and data type"""
-    valid_periods = MODEL_CONFIG[model]["period_type"].get(data_type, [])
+    schema = MODEL_CONFIG[model]["schema"]
+    valid_periods = TEMPORAL_SCHEMAS[schema]["period_type"].get(data_type, [])
     if period_type not in valid_periods:
         raise HTTPException(
             status_code=400,

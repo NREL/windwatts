@@ -4,16 +4,16 @@ import pandas as pd
 import calendar
 import numpy as np
 from scipy.interpolate import CubicSpline
-from enum import Enum
-from typing import Optional, List, Union
+from typing import List, Union
 from ..config.model_config import MODEL_CONFIG, TEMPORAL_SCHEMAS
+
 
 class PowerCurveManager:
     """
     Manages multiple power curves stored in a directory.
     """
 
-    def __init__(self,power_curve_dir: str):
+    def __init__(self, power_curve_dir: str):
         """
         Initialize PowerCurveManager to load multiple power curves.
 
@@ -26,21 +26,25 @@ class PowerCurveManager:
         """Get SWI preference from TEMPORAL_SCHEMAS config."""
         config = self._get_temporal_schema_config(schema)
         return config.get("use_swi", False)
-    
+
     def _get_schema_from_model(self, model_name: str) -> str:
         """Get DatasetSchema for a given model from MODEL_CONFIG"""
         if model_name not in MODEL_CONFIG:
-            raise ValueError(f"Invalid model name: {model_name}. Must be one of the {list(MODEL_CONFIG.keys())}")
+            raise ValueError(
+                f"Invalid model name: {model_name}. Must be one of the {list(MODEL_CONFIG.keys())}"
+            )
         schema = MODEL_CONFIG[model_name].get("schema")
         try:
             return schema
         except ValueError:
             raise ValueError(f"Unknown schema type in MODEL_CONFIG: {schema}")
-    
+
     def _get_temporal_schema_config(self, schema: str) -> dict:
         """Get TEMPORAL_SCHEMAS config for the given schema name."""
         if schema not in TEMPORAL_SCHEMAS:
-            raise ValueError(f"Unknown schema '{schema}' not found in TEMPORAL_SCHEMAS.")
+            raise ValueError(
+                f"Unknown schema '{schema}' not found in TEMPORAL_SCHEMAS."
+            )
         return TEMPORAL_SCHEMAS[schema]
 
     def load_power_curves(self, directory: str):
@@ -286,11 +290,8 @@ class PowerCurveManager:
                 "Dataset must contain either 'time' (datetime) or 'mohr' (month-hour encoding) column "
                 "for timeseries normalization."
             )
-    
-    def _validate_data_with_temporal_schema(
-        self,
-        df: pd.DataFrame,
-        schema: str):
+
+    def _validate_data_with_temporal_schema(self, df: pd.DataFrame, schema: str):
         """Validate the dataframe with repect to temporal schema config."""
         temporal_schema_config = self._get_temporal_schema_config(schema=schema)
 
@@ -300,39 +301,45 @@ class PowerCurveManager:
         df_cols = set(df.columns.str.lower())
 
         # validate required columns
-        required_cols = validation_rules.get('required_columns',[])
+        required_cols = validation_rules.get("required_columns", [])
         missing_cols = [col for col in required_cols if col.lower() not in df_cols]
         if missing_cols:
-            raise ValueError(f"Missing columns: {missing_cols} for the schema {schema}.")
-        
-        #validate for no temporal columns
-        if column_config.get('no_temporal_dims', False):
-            temporal_cols = [col for col in ['year', 'month', 'day', 'hour', 'time', 'mohr'] if col in df_cols]
+            raise ValueError(
+                f"Missing columns: {missing_cols} for the schema {schema}."
+            )
+
+        # validate for no temporal columns
+        if column_config.get("no_temporal_dims", False):
+            temporal_cols = [
+                col
+                for col in ["year", "month", "day", "hour", "time", "mohr"]
+                if col in df_cols
+            ]
             if temporal_cols:
                 raise ValueError(
                     f"Schema '{schema}' validation failed: "
                     f"Schema is atemporal and should NOT have temporal columns. "
                     f"Found: {temporal_cols}"
                 )
-        
+
         # validate for no year column
-        if validation_rules.get('no_year_column', False):
+        if validation_rules.get("no_year_column", False):
             if "year" in df_cols:
                 raise ValueError(
-                f"Schema '{schema}' validation failed: "
-                f"Schema should NOT have 'year' column."
-            )
-    
-    def _is_timeseries_schema(self, schema:str) -> bool:
+                    f"Schema '{schema}' validation failed: "
+                    f"Schema should NOT have 'year' column."
+                )
+
+    def _is_timeseries_schema(self, schema: str) -> bool:
         """Check if schema is timeseries by looking for time_column in config."""
         config = self._get_temporal_schema_config(schema)
-        return  'time_column' in config.get('column_config', {})
-    
-    def _is_quantile_schema(self, schema:str) -> bool:
+        return "time_column" in config.get("column_config", {})
+
+    def _is_quantile_schema(self, schema: str) -> bool:
         """Check if schema is quantile by looking for probability_column in config."""
         config = self._get_temporal_schema_config(schema)
-        return  'probability_column' in config.get('column_config', {})
-    
+        return "probability_column" in config.get("column_config", {})
+
     def _has_year_dimension(self, schema: str) -> bool:
         """Check if schema has year dimension by checking config flags."""
         config = self._get_temporal_schema_config(schema)
@@ -346,7 +353,7 @@ class PowerCurveManager:
         heights: Union[int, List[int]],
         selected_power_curve: str,
         model_name: str,
-        relevant_columns_only: bool = True
+        relevant_columns_only: bool = True,
     ) -> pd.DataFrame:
         """
         Computes energy production dataframe using the selected power curve.
@@ -426,7 +433,9 @@ class PowerCurveManager:
                     result_df["year"] = year
                     records.append(result_df)
 
-                out = pd.concat(records, ignore_index=True) if records else pd.DataFrame()
+                out = (
+                    pd.concat(records, ignore_index=True) if records else pd.DataFrame()
+                )
 
                 if not relevant_columns_only:
                     return out, schema
@@ -494,11 +503,11 @@ class PowerCurveManager:
                 errors="ignore",
             )
             schema_config = self._get_temporal_schema_config(schema)
-            time_col = schema_config.get("column_config",{}).get("time_column")
+            time_col = schema_config.get("column_config", {}).get("time_column")
 
             for year, group in work.groupby("year"):
                 avg_ws = group[ws_column].mean()
-                if time_col=="mohr":
+                if time_col == "mohr":
                     # sum of instantaneous power over typical month × 30 days
                     kwh = group[kw_column].sum() * 30
                 # time_col == "time"
@@ -513,7 +522,7 @@ class PowerCurveManager:
                         "kWh produced": kwh,
                     }
                 )
-        
+
         elif self._is_quantile_schema(schema):
             # Midpoints are equal-probability bins → average power × hours/year
             if self._has_year_dimension(schema):
@@ -540,9 +549,9 @@ class PowerCurveManager:
                 kwh = avg_power_kw * 8760.0
                 res_list.append(
                     {
-                        "year": None, 
-                        "Average wind speed (m/s)": avg_ws, 
-                        "kWh produced": kwh
+                        "year": None,
+                        "Average wind speed (m/s)": avg_ws,
+                        "kWh produced": kwh,
                     }
                 )
 
@@ -681,7 +690,7 @@ class PowerCurveManager:
         n_years = prod_df["year"].nunique()
         if n_years == 0:
             raise ValueError("No valid years found in timeseries data.")
-        
+
         schema_config = self._get_temporal_schema_config(schema)
         time_col = schema_config.get("column_config", {}).get("time_column")
 

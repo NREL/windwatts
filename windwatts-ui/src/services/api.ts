@@ -105,6 +105,8 @@ export const getCSVFile = async ({
   gridIndex,
   dataModel,
 }: WindCSVFileRequest) => {
+  // Hardcoding for now need to change it later
+  dataModel = 'era5-timeseries';
   const url = `/api/v1/${dataModel}/timeseries?gridIndex=${gridIndex}`;
 
   const options = {
@@ -122,6 +124,8 @@ export const getBatchCSVFiles = async ({
   gridLocations,
   dataModel,
 }: WindCSVFilesRequest) => {
+  // Hardcoding for now need to change it later
+  dataModel = 'era5-timeseries';
   const url = `/api/v1/${dataModel}/timeseries/batch`;
 
   const options = {

@@ -5,59 +5,53 @@ Defines the configuration for all supported wind data models including
 data sources, valid parameters, and model-specific settings.
 
 """
+
 TEMPORAL_SCHEMAS = {
     "full_hourly": {
         "description": "Full 8760-hour timeseries with datetime index",
-        "column_config": {
-            "time_column": "time"
-        },
-        "validation": {
-            "required_columns": ["time"]
-        },
-        "use_swi": False
+        "column_config": {"time_column": "time"},
+        "validation": {"required_columns": ["time"]},
+        "use_swi": False,
+        "period_type": {"timeseries_export": ["hourly", "monthly"]},
     },
     "aggregated_mohr": {
         "description": "Hourly-aggregated (12*24) with month-hour encoding",
-        "column_config": {
-            "time_column": "mohr"
-        },
+        "column_config": {"time_column": "mohr"},
         "validation": {
             "required_columns": ["mohr", "year"],
         },
-        "use_swi": False
+        "use_swi": False,
+        "period_type": {
+            "windspeed": ["all", "annual", "monthly", "hourly"],
+            "production": ["all", "summary", "annual", "monthly", "full"],
+        },
     },
     "quantile_yearly": {
         "description": "Quantile distributions per year",
-        "column_config": {
-            "probability_column": "probability"
+        "column_config": {"probability_column": "probability"},
+        "validation": {"required_columns": ["probability", "year"]},
+        "use_swi": True,
+        "period_type": {
+            "windspeed": ["all", "annual"],
+            "production": ["all", "summary", "annual", "full"],
         },
-        "validation": {
-            "required_columns": ["probability", "year"]
-        },
-        "use_swi": True
     },
     "quantile_atemporal": {
         "description": "Global quantiles without temporal dimension",
         "column_config": {
             "probability_column": "probability",
-            "no_temporal_dims": True
+            "no_temporal_dims": True,
         },
-        "validation": {
-            "required_columns": ["probability"],
-            "no_year_column": True
-        },
-        "use_swi": False
-    }
+        "validation": {"required_columns": ["probability"], "no_year_column": True},
+        "use_swi": False,
+        "period_type": {"windspeed": ["all"], "production": ["all"]},
+    },
 }
 
 MODEL_CONFIG = {
     "era5-quantiles": {
         "source": "athena",
         "schema": "quantile_yearly",
-        "period_type": {
-            "windspeed": ["all", "annual"],
-            "production": ["all", "summary", "annual", "full"],
-        },
         "years": {"full": list(range(2013, 2024)), "sample": [2020, 2021, 2022, 2023]},
         "heights": [30, 40, 50, 60, 80, 100],
         "grid_info": {
@@ -76,11 +70,6 @@ MODEL_CONFIG = {
     "wtk-timeseries": {
         "source": "athena",
         "schema": "aggregated_mohr",
-        "period_type": {
-            "windspeed": ["all", "annual", "monthly", "hourly"],
-            "production": ["all", "summary", "annual", "monthly", "full"],
-            "timeseries_export": ["hourly", "monthly"]
-        },
         "years": {"full": list(range(2000, 2021)), "sample": [2018, 2019, 2020]},
         "heights": [40, 60, 80, 100, 120, 140, 160, 200],
         "grid_info": {
@@ -101,7 +90,6 @@ MODEL_CONFIG = {
     "ensemble-quantiles": {
         "source": "athena",
         "schema": "quantile_atemporal",
-        "period_type": {"windspeed": ["all"], "production": ["all"]},
         "years": {"full": list(range(2013, 2024)), "sample": []},
         "heights": [30, 40, 50, 60, 80, 100],
         "grid_info": {
@@ -120,9 +108,6 @@ MODEL_CONFIG = {
     "era5-timeseries": {
         "source": "s3",
         "schema": "full_hourly",
-        "period_type": {
-            "timeseries_export": ["hourly", "monthly"] 
-        },
         "years": {"full": list(range(2013, 2024)), "sample": [2020, 2021, 2022, 2023]},
         "heights": [30, 40, 50, 60, 80, 100],
         "grid_info": {

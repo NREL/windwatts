@@ -14,7 +14,9 @@ class TestV1WindspeedEndpoints:
 
     def test_era5_windspeed_default(self):
         """Test ERA5 windspeed with default period."""
-        response = client.get("/api/v1/era5-quantiles/windspeed?lat=40.0&lng=-70.0&height=40")
+        response = client.get(
+            "/api/v1/era5-quantiles/windspeed?lat=40.0&lng=-70.0&height=40"
+        )
         assert response.status_code == 200
         json = response.json()
         assert "global_avg" in json
@@ -44,14 +46,18 @@ class TestV1WindspeedEndpoints:
 
     def test_wtk_windspeed_default(self):
         """Test WTK windspeed with default period."""
-        response = client.get("/api/v1/wtk-timeseries/windspeed?lat=40.0&lng=-100.0&height=80")
+        response = client.get(
+            "/api/v1/wtk-timeseries/windspeed?lat=40.0&lng=-100.0&height=80"
+        )
         assert response.status_code == 200
         json = response.json()
         assert "global_avg" in json
 
     def test_ensemble_windspeed(self):
         """Test ensemble windspeed."""
-        response = client.get("/api/v1/ensemble-quantiles/windspeed?lat=40.0&lng=-70.0&height=40")
+        response = client.get(
+            "/api/v1/ensemble-quantiles/windspeed?lat=40.0&lng=-70.0&height=40"
+        )
         assert response.status_code == 200
         json = response.json()
         assert "global_avg" in json
@@ -169,7 +175,9 @@ class TestV1GridPoints:
 
     def test_era5_grid_points(self):
         """Test ERA5 grid points lookup."""
-        response = client.get("/api/v1/era5-quantiles/grid-points?lat=40.0&lng=-70.0&limit=1")
+        response = client.get(
+            "/api/v1/era5-quantiles/grid-points?lat=40.0&lng=-70.0&limit=1"
+        )
         assert response.status_code == 200
         json = response.json()
         assert "locations" in json
@@ -181,14 +189,18 @@ class TestV1GridPoints:
 
     def test_grid_points_multiple_neighbors(self):
         """Test grid points with multiple neighbors."""
-        response = client.get("/api/v1/era5-quantiles/grid-points?lat=40.0&lng=-70.0&limit=4")
+        response = client.get(
+            "/api/v1/era5-quantiles/grid-points?lat=40.0&lng=-70.0&limit=4"
+        )
         assert response.status_code == 200
         json = response.json()
         assert len(json["locations"]) == 4
 
     def test_wtk_grid_points(self):
         """Test WTK grid points lookup."""
-        response = client.get("/api/v1/wtk-timeseries/grid-points?lat=40.0&lng=-100.0&limit=1")
+        response = client.get(
+            "/api/v1/wtk-timeseries/grid-points?lat=40.0&lng=-100.0&limit=1"
+        )
         assert response.status_code == 200
         json = response.json()
         assert "locations" in json
@@ -199,17 +211,23 @@ class TestV1Validation:
 
     def test_invalid_latitude(self):
         """Test with invalid latitude."""
-        response = client.get("/api/v1/era5-quantiles/windspeed?lat=100.0&lng=-70.0&height=40")
+        response = client.get(
+            "/api/v1/era5-quantiles/windspeed?lat=100.0&lng=-70.0&height=40"
+        )
         assert response.status_code == 400
 
     def test_invalid_longitude(self):
         """Test with invalid longitude."""
-        response = client.get("/api/v1/era5-quantiles/windspeed?lat=40.0&lng=-200.0&height=40")
+        response = client.get(
+            "/api/v1/era5-quantiles/windspeed?lat=40.0&lng=-200.0&height=40"
+        )
         assert response.status_code == 400
 
     def test_invalid_height(self):
         """Test with invalid height."""
-        response = client.get("/api/v1/era5-quantiles/windspeed?lat=40.0&lng=-70.0&height=500")
+        response = client.get(
+            "/api/v1/era5-quantiles/windspeed?lat=40.0&lng=-70.0&height=500"
+        )
         assert response.status_code == 400
 
     def test_missing_required_params(self):
